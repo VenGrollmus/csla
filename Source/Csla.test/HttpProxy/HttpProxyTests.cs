@@ -24,9 +24,9 @@ public class HttpProxyTests
   {
     _testDIContext = TestDIContextFactory.CreateDefaultContext();
     var applicationContext = _testDIContext.CreateTestApplicationContext();
-    var dataPortalOptions = applicationContext.GetRequiredService<DataPortalOptions>();
+    var dataPortalOptions = applicationContext.GetRequiredService<Csla.Configuration.DataPortalOptions>();
 
-    var proxyOptions = new HttpProxyOptions();
+    var proxyOptions = new Csla.Channels.Http.HttpProxyOptions();
     _systemUnderTest = new TestHttpProxy(applicationContext, null, proxyOptions, dataPortalOptions);
     _testHttClientHandler = new TestHttpClientHandler();
     _systemUnderTest.TestHttpClientHandlerToReturn = _testHttClientHandler;
@@ -45,7 +45,7 @@ public class HttpProxyTests
   }
 
   [TestMethod]
-  public async Task ExecuteAsync_WithArrayOfParameters_ItShouldBeSerializable()
+  public async Task ExecuteAsync_WithPrimitiveObject()
   {
     IDataPortal<SingleCommand> dataPortal = _clientSideServiceProvider.GetRequiredService<IDataPortal<SingleCommand>>();
 
@@ -55,7 +55,7 @@ public class HttpProxyTests
   }
 
   [TestMethod]
-  public async Task ExecuteAsync_WithSingleParameter_ItShouldBeSerializable()
+  public async Task ExecuteAsync()
   {
     IDataPortal<SingleCommand> dataPortal = _clientSideServiceProvider.GetRequiredService<IDataPortal<SingleCommand>>();
 

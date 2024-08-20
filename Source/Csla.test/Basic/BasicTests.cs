@@ -33,7 +33,7 @@ namespace Csla.Test.Basic
     {
       IDataPortal<DataBinding.ParentEntity> dataPortal = _testDIContext.CreateDataPortal<DataBinding.ParentEntity>();
 
-      DataBinding.ParentEntity p = DataBinding.ParentEntity.NewParentEntity(dataPortal);
+      Csla.Test.DataBinding.ParentEntity p = DataBinding.ParentEntity.NewParentEntity(dataPortal);
 
       p.NotUndoable = "something";
       p.Data = "data";
@@ -412,7 +412,7 @@ namespace Csla.Test.Basic
     private GenRoot NewGenRoot()
     {
       IDataPortal<GenRoot> dataPortal = _testDIContext.CreateDataPortal<GenRoot>();
-      return dataPortal.Create(new GenRootBase.Criteria());
+      return dataPortal.Create(new GenRoot.Criteria());
     }
   }
 
@@ -422,23 +422,23 @@ namespace Csla.Test.Basic
 
     public FormSimulator(Core.BusinessBase obj)
     {
-      _obj.PropertyChanged += obj_IsDirtyChanged;
-      _obj = obj;
+      this._obj.PropertyChanged += obj_IsDirtyChanged;
+      this._obj = obj;
     }
 
     private void obj_IsDirtyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     { }
   }
 
-  [Serializable]
+  [Serializable()]
   public class SerializableListener
   {
     private Core.BusinessBase _obj;
 
     public SerializableListener(Core.BusinessBase obj)
     {
-      _obj.PropertyChanged += obj_IsDirtyChanged;
-      _obj = obj;
+      this._obj.PropertyChanged += obj_IsDirtyChanged;
+      this._obj = obj;
     }
 
     public void obj_IsDirtyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

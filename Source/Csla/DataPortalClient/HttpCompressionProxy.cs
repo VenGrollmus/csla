@@ -8,7 +8,6 @@
 
 using System.Net;
 using System.Net.Http;
-using System.Runtime.Versioning;
 using Csla.Configuration;
 
 namespace Csla.Channels.Http
@@ -17,9 +16,6 @@ namespace Csla.Channels.Http
   /// Implements a data portal proxy to relay data portal
   /// calls to a remote application server by using http.
   /// </summary>
-#if NET8_0_OR_GREATER
-  [UnsupportedOSPlatform("browser")]
-#endif
   public class HttpCompressionProxy : HttpProxy
   {
     /// <summary>

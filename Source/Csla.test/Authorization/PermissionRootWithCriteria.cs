@@ -10,17 +10,17 @@ using Csla.Rules;
 
 namespace Csla.Test.Authorization 
 {
-  [Serializable]
+  [Serializable()]
   public class PermissionRootWithCriteria : BusinessBase<PermissionRootWithCriteria>
   {
     public static void AddObjectAuthorizationRules() {
-      BusinessRules.AddRule(
+      Csla.Rules.BusinessRules.AddRule(
         typeof(PermissionRootWithCriteria),
         new AuthRuleExpectsCriteria(AuthorizationActions.CreateObject));
-      BusinessRules.AddRule(
+      Csla.Rules.BusinessRules.AddRule(
         typeof(PermissionRootWithCriteria),
         new AuthRuleExpectsCriteria(AuthorizationActions.GetObject));
-      BusinessRules.AddRule(
+      Csla.Rules.BusinessRules.AddRule(
         typeof(PermissionRootWithCriteria),
         new AuthRuleExpectsCriteria(AuthorizationActions.DeleteObject));
     }

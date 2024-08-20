@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\Directory.Package.props" />
 
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
@@ -11,9 +10,6 @@
     <AssemblyOriginatorKeyFile>..\Csla\CslaKey.snk</AssemblyOriginatorKeyFile>
     <BaseOutputPath>..\..\Bin</BaseOutputPath>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Nullable>enable</Nullable>
-    <Title>CSLA .NET ASP.NET MVC 5</Title>
-    <PackageTags>CSLA;ASP.NET;MVC</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

@@ -46,7 +46,7 @@ namespace Csla.Test.ValidationRules
       }
       else
       {
-        if (IsNew)
+        if (this.IsNew)
         {
           //we would insert here
           TestResults.Add("HasRulesManager2", "Inserted");

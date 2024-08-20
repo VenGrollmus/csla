@@ -6,7 +6,7 @@
 // <summary>Implement extension methods for AspNet configuration</summary>
 //-----------------------------------------------------------------------
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
 using Csla.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 #endif
@@ -35,14 +35,11 @@ namespace Csla.Configuration
     /// </summary>
     /// <param name="config">CslaOptions instance</param>
     /// <param name="options">Options object</param>
-    /// <exception cref="ArgumentNullException"><paramref name="config"/> is <see langword="null"/>.</exception>
-    public static CslaOptions AddAspNetCore(this CslaOptions config, Action<AspNetCoreConfigurationOptions>? options)
+    public static CslaOptions AddAspNetCore(this CslaOptions config, Action<AspNetCoreConfigurationOptions> options)
     {
-      ArgumentNullException.ThrowIfNull(config);
-
       var localOptions = new AspNetCoreConfigurationOptions();
       options?.Invoke(localOptions);
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
       config.Services.AddScoped<ActiveCircuitState>();
       config.Services.AddScoped(typeof(CircuitHandler), typeof(ActiveCircuitHandler));
 #endif

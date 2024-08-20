@@ -5,9 +5,13 @@
 // </copyright>
 // <summary>Html extension methods providing support for HTML rendering based on security permissions in an application.</summary>
 //-----------------------------------------------------------------------
-#if NETSTANDARD2_0 || NET8_0_OR_GREATER 
+#if NETSTANDARD2_0 || NET5_0_OR_GREATER || NETCOREAPP3_1
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Csla.AspNetCore;
 
 namespace Csla.Web.Mvc
 {
@@ -29,9 +33,9 @@ namespace Csla.Web.Mvc
     {
       var result = string.Empty;
       var model = htmlHelper.ViewData.Model;
-      System.Reflection.PropertyInfo reflectedPropertyInfo = Reflection.Reflect<T>.GetProperty(expression);
+      System.Reflection.PropertyInfo reflectedPropertyInfo = Csla.Reflection.Reflect<T>.GetProperty(expression);
       var propertyName = reflectedPropertyInfo.Name;
-      if (model is Core.BusinessBase bb)
+      if (model is Csla.Core.BusinessBase bb)
         result = bb.BrokenRulesCollection.ToString(",", Rules.RuleSeverity.Information, propertyName);
       return new HtmlString(result);
     }
@@ -49,9 +53,9 @@ namespace Csla.Web.Mvc
     {
       var result = string.Empty;
       var model = htmlHelper.ViewData.Model;
-      System.Reflection.PropertyInfo reflectedPropertyInfo = Reflection.Reflect<T>.GetProperty(expression);
+      System.Reflection.PropertyInfo reflectedPropertyInfo = Csla.Reflection.Reflect<T>.GetProperty(expression);
       var propertyName = reflectedPropertyInfo.Name;
-      if (model is Core.BusinessBase bb)
+      if (model is Csla.Core.BusinessBase bb)
         result = bb.BrokenRulesCollection.ToString(",", Rules.RuleSeverity.Warning, propertyName);
       return new HtmlString(result);
     }
@@ -69,19 +73,16 @@ namespace Csla.Web.Mvc
     {
       var result = string.Empty;
       var model = htmlHelper.ViewData.Model;
-      System.Reflection.PropertyInfo reflectedPropertyInfo = Reflection.Reflect<T>.GetProperty(expression);
+      System.Reflection.PropertyInfo reflectedPropertyInfo = Csla.Reflection.Reflect<T>.GetProperty(expression);
       var propertyName = reflectedPropertyInfo.Name;
-      if (model is Core.BusinessBase bb)
+      if (model is Csla.Core.BusinessBase bb)
         result = bb.BrokenRulesCollection.ToString(",", Rules.RuleSeverity.Error, propertyName);
       return new HtmlString(result);
     }
 
     private static ApplicationContext GetApplication(IHtmlHelper htmlHelper)
     {
-      var applicationContext = (ApplicationContext?)htmlHelper.ViewContext.HttpContext.Items["Csla.ApplicationContext"];
-      if (applicationContext is null)
-        throw new InvalidOperationException($"{nameof(ApplicationContext)} == null");
-      return applicationContext;
+      return (ApplicationContext)htmlHelper.ViewContext.HttpContext.Items["Csla.ApplicationContext"];
     }
 
     /// <summary>
@@ -95,13 +96,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     HtmlString granted,
                                     HtmlString denied)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return granted;
       else
         return denied;
@@ -118,13 +119,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     HtmlString granted,
                                     string denied)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return granted;
       else
         return new HtmlString(denied);
@@ -141,13 +142,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     string granted,
                                     string denied)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return new HtmlString(granted);
       else
         return new HtmlString(denied);
@@ -165,14 +166,14 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     HtmlString granted,
                                     HtmlString denied)
     {
       _ = htmlHelper;
-      if (target is not Security.IAuthorizeReadWrite instance) return denied;
+      if (target is not Csla.Security.IAuthorizeReadWrite instance) return denied;
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||
           (action == Rules.AuthorizationActions.WriteProperty && instance.CanWriteProperty(member.Name)) ||
@@ -194,14 +195,14 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     HtmlString granted,
                                     string denied)
     {
       _ = htmlHelper;
-      if (target is not Security.IAuthorizeReadWrite instance) return new HtmlString(denied);
+      if (target is not Csla.Security.IAuthorizeReadWrite instance) return new HtmlString(denied);
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||
           (action == Rules.AuthorizationActions.WriteProperty && instance.CanWriteProperty(member.Name)) ||
@@ -223,14 +224,14 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     string granted,
                                     string denied)
     {
       _ = htmlHelper;
-      var instance = target as Security.IAuthorizeReadWrite;
+      var instance = target as Csla.Security.IAuthorizeReadWrite;
       if (instance == null) return new HtmlString(denied);
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||
@@ -251,12 +252,12 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     Func<IHtmlHelper, HtmlString> grantedAction)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return grantedAction.Invoke(htmlHelper);
       else
         return HtmlString.Empty;
@@ -274,13 +275,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static HtmlString HasPermission(
                                     this IHtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     Func<IHtmlHelper, HtmlString> grantedAction,
                                     Func<IHtmlHelper, HtmlString> denieddAction)
     {
-      if (target is not Security.IAuthorizeReadWrite instance) return denieddAction.Invoke(htmlHelper);
+      if (target is not Csla.Security.IAuthorizeReadWrite instance) return denieddAction.Invoke(htmlHelper);
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||
           (action == Rules.AuthorizationActions.WriteProperty && instance.CanWriteProperty(member.Name)) ||
@@ -292,7 +293,13 @@ namespace Csla.Web.Mvc
   }
 }
 #else
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Web.Mvc;
+using System.Web.Mvc.Html;
+using System.Web.Routing;
 
 namespace Csla.Web.Mvc
 {
@@ -317,13 +324,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     MvcHtmlString granted,
                                     MvcHtmlString denied)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return granted;
       else
         return denied;
@@ -340,13 +347,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     MvcHtmlString granted,
                                     string denied)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return granted;
       else
         return MvcHtmlString.Create(denied);
@@ -363,13 +370,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     string granted,
                                     string denied)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return MvcHtmlString.Create(granted);
       else
         return MvcHtmlString.Create(denied);
@@ -387,14 +394,14 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     MvcHtmlString granted,
                                     MvcHtmlString denied)
     {
       _ = htmlHelper;
-      var instance = target as Security.IAuthorizeReadWrite;
+      var instance = target as Csla.Security.IAuthorizeReadWrite;
       if (instance == null) return denied;
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||
@@ -417,14 +424,14 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     MvcHtmlString granted,
                                     string denied)
     {
       _ = htmlHelper;
-      var instance = target as Security.IAuthorizeReadWrite;
+      var instance = target as Csla.Security.IAuthorizeReadWrite;
       if (instance == null) return MvcHtmlString.Create(denied);
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||
@@ -447,14 +454,14 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     string granted,
                                     string denied)
     {
       _ = htmlHelper;
-      var instance = target as Security.IAuthorizeReadWrite;
+      var instance = target as Csla.Security.IAuthorizeReadWrite;
       if (instance == null) return MvcHtmlString.Create(denied);
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||
@@ -475,12 +482,12 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     Type objectType,
                                     Func<HtmlHelper, MvcHtmlString> grantedAction)
     {
       var applicationContext = GetApplication(htmlHelper);
-      if (Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
+      if (Csla.Rules.BusinessRules.HasPermission(applicationContext, action, objectType))
         return grantedAction.Invoke(htmlHelper);
       else
         return MvcHtmlString.Empty;
@@ -498,13 +505,13 @@ namespace Csla.Web.Mvc
     /// <returns>The appropriate HTML rendered output.</returns>
     public static MvcHtmlString HasPermission(
                                     this HtmlHelper htmlHelper,
-                                    Rules.AuthorizationActions action,
+                                    Csla.Rules.AuthorizationActions action,
                                     object target,
-                                    Core.IMemberInfo member,
+                                    Csla.Core.IMemberInfo member,
                                     Func<HtmlHelper, MvcHtmlString> grantedAction,
                                     Func<HtmlHelper, MvcHtmlString> denieddAction)
     {
-      var instance = target as Security.IAuthorizeReadWrite;
+      var instance = target as Csla.Security.IAuthorizeReadWrite;
       if (instance == null) return denieddAction.Invoke(htmlHelper);
 
       if ((action == Rules.AuthorizationActions.ReadProperty && instance.CanReadProperty(member.Name)) ||

@@ -131,7 +131,7 @@ namespace Csla.Test.ValidationRules
   /// <summary>
   /// CalcSum rule will set primary property to the sum of all.
   /// </summary>
-  public class CalcSum : PropertyRule
+  public class CalcSum : Csla.Rules.PropertyRule
   {
     /// <summary>
     /// Initializes a new instance of the <see cref="CalcSum"/> class.
@@ -141,6 +141,10 @@ namespace Csla.Test.ValidationRules
     public CalcSum(IPropertyInfo primaryProperty, params IPropertyInfo[] inputProperties)
       : base(primaryProperty)
     {
+      if (InputProperties == null)
+      {
+        InputProperties = [];
+      }
       InputProperties.AddRange(inputProperties);
 
       CanRunOnServer = false;
@@ -157,7 +161,7 @@ namespace Csla.Test.ValidationRules
     }
   }
 
-  public class ValidateRootObject : ObjectRule
+  public class ValidateRootObject : Csla.Rules.ObjectRule
   {
     public ValidateRootObject()
       : base()
@@ -209,8 +213,7 @@ namespace Csla.Test.ValidationRules
       : base(primaryProperty)
     {
       CompareTo = compareToProperty;
-      InputProperties.Add(primaryProperty);
-      InputProperties.Add(compareToProperty);
+      InputProperties = [primaryProperty, compareToProperty];
       AffectedProperties.Add(compareToProperty);
     }
 
@@ -238,7 +241,7 @@ namespace Csla.Test.ValidationRules
       : base(primaryProperty)
     {
       NameProperty = nameProperty;
-      InputProperties.Add(primaryProperty);
+      InputProperties = [primaryProperty];
       AffectedProperties.Add(NameProperty);
 
       CanRunOnServer = false;

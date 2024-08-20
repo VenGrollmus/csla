@@ -6,14 +6,17 @@
 // <summary>Exposes server-side DataPortal functionality</summary>
 //-----------------------------------------------------------------------
 
-using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using Csla.Serialization;
 using Csla.Server.Hosts.DataPortalChannel;
 
-#if NETSTANDARD2_0 || NET8_0_OR_GREATER 
+#if NETSTANDARD2_0 || NET5_0_OR_GREATER || NETCOREAPP3_1
+
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+
 #else
-using System.Net.Http;
 using System.Web.Http;
 #endif
 
@@ -23,7 +26,7 @@ namespace Csla.Server.Hosts
   /// Exposes server-side DataPortal functionality
   /// through HTTP request/response.
   /// </summary>
-#if NETSTANDARD2_0 || NET8_0_OR_GREATER 
+#if NETSTANDARD2_0 || NET5_0_OR_GREATER || NETCOREAPP3_1
 
   public class HttpPortalController : Controller
   {
@@ -67,7 +70,7 @@ namespace Csla.Server.Hosts
       }
     }
 
-    private static HttpClient? _client;
+    private static HttpClient _client;
 
     /// <summary>
     /// Gets a dictionary containing the URLs for each
@@ -86,15 +89,14 @@ namespace Csla.Server.Hosts
     /// Gets an HttpClient object for use in
     /// communication with the server.
     /// </summary>
-    [MemberNotNull(nameof(_client))]
     protected virtual HttpClient GetHttpClient()
     {
       if (_client == null)
       {
         _client = new HttpClient();
-        if (HttpClientTimeout > 0)
+        if (this.HttpClientTimeout > 0)
         {
-          _client.Timeout = TimeSpan.FromMilliseconds(HttpClientTimeout);
+          _client.Timeout = TimeSpan.FromMilliseconds(this.HttpClientTimeout);
         }
       }
 
@@ -108,7 +110,7 @@ namespace Csla.Server.Hosts
     /// <param name="routingTag">Routing tag from caller</param>
     protected virtual async Task PostAsync(string operation, string routingTag)
     {
-      if (RoutingTagUrls.TryGetValue(routingTag, out string? route) && route != "localhost")
+      if (RoutingTagUrls.TryGetValue(routingTag, out string route) && route != "localhost")
       {
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, $"{route}?operation={operation}");
         using (var buffer = new MemoryStream())
@@ -153,7 +155,7 @@ namespace Csla.Server.Hosts
     }
 #endif
 
-    private HttpPortal? _portal;
+    private HttpPortal _portal;
 
     /// <summary>
     /// Gets or sets the HttpPortal implementation
@@ -171,7 +173,7 @@ namespace Csla.Server.Hosts
       set { _portal = value; }
     }
 
-#if NETSTANDARD2_0 || NET8_0_OR_GREATER 
+#if NETSTANDARD2_0 || NET5_0_OR_GREATER || NETCOREAPP3_1
 
     /// <summary>
     /// Override to add elements to the HttpReponse
@@ -187,13 +189,17 @@ namespace Csla.Server.Hosts
 
     private async Task InvokePortal(string operation, Stream requestStream, Stream responseStream)
     {
-      var serializer = _applicationContext.GetRequiredService<ISerializationFormatter>();
+      var serializer = SerializationFormatterFactory.GetFormatter(_applicationContext);
       var result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
-      DataPortalErrorInfo? errorData = null;
+      DataPortalErrorInfo errorData = null;
       if (UseTextSerialization)
-        Response.Headers.ContentType = "text/plain";
+      {
+        Response.Headers["Content-type"] = "application/base64,text/plain";
+      }
       else
-        Response.Headers.ContentType = "application/octet-stream";
+      {
+        Response.Headers["Content-type"] = "application/octet-stream";
+      }
       SetHttpResponseHeaders(Response);
       try
       {
@@ -215,16 +221,15 @@ namespace Csla.Server.Hosts
 
     private async Task InvokeTextPortal(string operation, Stream requestStream, Stream responseStream)
     {
-      Response.Headers.ContentType = "text/plain";
       string requestString;
       using (var reader = new StreamReader(requestStream))
         requestString = await reader.ReadToEndAsync();
-      var requestArray = Convert.FromBase64String(requestString);
+      var requestArray = System.Convert.FromBase64String(requestString);
       var requestBuffer = new MemoryStream(requestArray);
 
-      var serializer = _applicationContext.GetRequiredService<ISerializationFormatter>();
+      var serializer = SerializationFormatterFactory.GetFormatter(_applicationContext);
       var result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
-      DataPortalErrorInfo? errorData = null;
+      DataPortalErrorInfo errorData = null;
       try
       {
         var request = serializer.Deserialize(requestBuffer);
@@ -247,21 +252,21 @@ namespace Csla.Server.Hosts
       {
         AutoFlush = true
       };
-      await writer.WriteAsync(Convert.ToBase64String(responseBuffer.ToArray()));
+      await writer.WriteAsync(System.Convert.ToBase64String(responseBuffer.ToArray()));
     }
 
 #else
     private async Task<byte[]> InvokePortal(string operation, byte[] data)
     {
       var result = _applicationContext.CreateInstance<DataPortalResponse>();
-      DataPortalErrorInfo? errorData = null;
+      DataPortalErrorInfo errorData = null;
       try
       {
         var buffer = new MemoryStream(data)
         {
           Position = 0
         };
-        var request = _applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(buffer.ToArray());
+        var request = SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(buffer.ToArray());
         result = await CallPortal(operation, request);
       }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -273,7 +278,7 @@ namespace Csla.Server.Hosts
       var portalResult = _applicationContext.CreateInstance<DataPortalResponse>();
       portalResult.ErrorData = errorData;
       portalResult.ObjectData = result.ObjectData;
-      var bytes = _applicationContext.GetRequiredService<ISerializationFormatter>().Serialize(portalResult);
+      var bytes = SerializationFormatterFactory.GetFormatter(_applicationContext).Serialize(portalResult);
       return bytes;
     }
 #endif

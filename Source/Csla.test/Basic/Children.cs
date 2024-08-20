@@ -10,12 +10,12 @@ using System.Data;
 
 namespace Csla.Test.Basic
 {
-  [Serializable]
+  [Serializable()]
   public class Children : BusinessBindingListBase<Children, Child>
   {
     public void Add(IDataPortal<Child> dataPortal, string data)
     {
-      Add(Child.NewChild(dataPortal, data));
+      this.Add(Child.NewChild(dataPortal, data));
     }
 
     internal static Children NewChildren(IDataPortal<Children> dataPortal)
@@ -30,12 +30,12 @@ namespace Csla.Test.Basic
 
     public Children()
     {
-      MarkAsChild();
+      this.MarkAsChild();
     }
 
     public int DeletedCount
     {
-      get { return DeletedList.Count; }
+      get { return this.DeletedList.Count; }
     }
 
     [Create]

@@ -23,7 +23,7 @@ namespace Csla.Test.FieldManager
 
     public object MyParent
     {
-      get { return Parent; }
+      get { return this.Parent; }
     }
 
     public string Status { get; private set; }

@@ -17,7 +17,7 @@ namespace ProjectTracker.Library
     public ValidRole(Csla.Core.IPropertyInfo primaryProperty)
       : base(primaryProperty)
     {
-      InputProperties.Add(primaryProperty);
+      InputProperties = new List<Csla.Core.IPropertyInfo> { primaryProperty };
     }
 
     protected override async Task ExecuteAsync(IRuleContext context)

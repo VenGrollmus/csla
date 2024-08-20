@@ -11,9 +11,6 @@ using Csla.Properties;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-#if NET8_0_OR_GREATER
-using System.Runtime.Versioning;
-#endif
 using System.Text;
 
 namespace Csla.Channels.Http
@@ -24,8 +21,6 @@ namespace Csla.Channels.Http
   /// </summary>
   public class HttpProxy : DataPortalProxy
   {
-    private HttpClient _httpClient;
-
     /// <summary>
     /// Creates an instance of the type, initializing
     /// it to use the supplied HttpClient object and options.
@@ -47,7 +42,7 @@ namespace Csla.Channels.Http
     /// Current options for the proxy.
     /// </summary>
     protected HttpProxyOptions Options { get; set; }
-
+    private HttpClient _httpClient;
     private string VersionRoutingTag { get; set; }
 
 #nullable enable
@@ -74,7 +69,7 @@ namespace Csla.Channels.Http
         _httpClient = new HttpClient(handler);
         if (Timeout > 0)
         {
-          _httpClient.Timeout = TimeSpan.FromMilliseconds(Timeout);
+          _httpClient.Timeout = TimeSpan.FromMilliseconds(this.Timeout);
         }
       }
       
@@ -83,16 +78,9 @@ namespace Csla.Channels.Http
       HttpClientHandler CreateDefaultHandler()
       {
         var handler = new HttpClientHandler();
-#if NET8_0_OR_GREATER
-        // Browser does not support customization of HttpClientHandler, since it's provided by browser.
-        if (OperatingSystem.IsBrowser())
-        {
-          return handler;
-        }
-#endif
         if (!Options.UseTextSerialization)
         {
-            handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+          handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
         }
 
         return handler;
@@ -103,12 +91,9 @@ namespace Csla.Channels.Http
     /// Gets an WebClient object for use in
     /// synchronous communication with the server.
     /// </summary>
-#if NET8_0_OR_GREATER
-    [UnsupportedOSPlatform("browser")]
-#endif
     protected virtual WebClient GetWebClient()
     {
-      return new DefaultWebClient(Timeout);
+      return new DefaultWebClient(this.Timeout);
     }
 
     /// <summary>
@@ -123,7 +108,7 @@ namespace Csla.Channels.Http
     {
       return isSync
         ? CallViaWebClient(serialized, operation, routingToken)
-        : await CallViaHttpClient(serialized, operation, routingToken).ConfigureAwait(false);
+        : await CallViaHttpClient(serialized, operation, routingToken);
     }
 
     /// <summary>
@@ -147,51 +132,38 @@ namespace Csla.Channels.Http
     private async Task<byte[]> CallViaHttpClient(byte[] serialized, string operation, string routingToken)
     {
       var client = GetHttpClient();
-      using var httpRequest = new HttpRequestMessage(
+      var httpRequest = new HttpRequestMessage(
         HttpMethod.Post,
         $"{DataPortalUrl}?operation={CreateOperationTag(operation, VersionRoutingTag, routingToken)}");
       SetHttpRequestHeaders(httpRequest);
 #if NET8_0_OR_GREATER
       if (Options.UseTextSerialization)
-      {
         httpRequest.Content = new StringContent(
-          Convert.ToBase64String(serialized),
+          System.Convert.ToBase64String(serialized), 
           mediaType: new MediaTypeHeaderValue("application/base64,text/plain"));
-      }
       else
-      {
         httpRequest.Content = new ByteArrayContent(serialized);
-        httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-      }
 #else
       if (Options.UseTextSerialization)
-      {
-        httpRequest.Content = new StringContent(Convert.ToBase64String(serialized));
-        httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
-      }
+        httpRequest.Content = new StringContent(System.Convert.ToBase64String(serialized));
       else
-      {
         httpRequest.Content = new ByteArrayContent(serialized);
-        httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-      }
 #endif
-      using var httpResponse = await client.SendAsync(httpRequest).ConfigureAwait(false);
-      await VerifyResponseSuccess(httpResponse).ConfigureAwait(false);
+      using var httpResponse = await client.SendAsync(httpRequest);
+      await VerifyResponseSuccess(httpResponse);
       if (Options.UseTextSerialization)
-        serialized = Convert.FromBase64String(await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false));
+        serialized = Convert.FromBase64String(await httpResponse.Content.ReadAsStringAsync());
       else
-        serialized = await httpResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+        serialized = await httpResponse.Content.ReadAsByteArrayAsync();
       return serialized;
     }
 
     private byte[] CallViaWebClient(byte[] serialized, string operation, string routingToken)
     {
-#if NET8_0_OR_GREATER
-      if (OperatingSystem.IsBrowser())
+      if (!WebCallCapabilities.AreSyncWebClientMethodsSupported())
       {
-        throw new PlatformNotSupportedException(Resources.SyncDataAccessNotSupportedException);
+        throw new NotSupportedException(Resources.SyncDataAccessNotSupportedException);
       }
-#endif
       WebClient client = GetWebClient();
       var url = $"{DataPortalUrl}?operation={CreateOperationTag(operation, VersionRoutingTag, routingToken)}";
       client.Headers["Content-Type"] = Options.UseTextSerialization ? "application/base64,text/plain" : "application/octet-stream";
@@ -200,8 +172,8 @@ namespace Csla.Channels.Http
       {
         if (Options.UseTextSerialization)
         {
-          var result = client.UploadString(url, Convert.ToBase64String(serialized));
-          serialized = Convert.FromBase64String(result);
+          var result = client.UploadString(url, System.Convert.ToBase64String(serialized));
+          serialized = System.Convert.FromBase64String(result);
         }
         else
         {
@@ -215,8 +187,8 @@ namespace Csla.Channels.Http
         string message;
         if (ex.Response != null)
         {
-          using var reader = new StreamReader(ex.Response.GetResponseStream());
-          message = reader.ReadToEnd();
+          using (var reader = new System.IO.StreamReader(ex.Response.GetResponseStream()))
+            message = reader.ReadToEnd();
         }
         else
         {
@@ -234,7 +206,7 @@ namespace Csla.Channels.Http
         message.Append((int)httpResponse.StatusCode);
         message.Append(": ");
         message.Append(httpResponse.ReasonPhrase);
-        var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var content = await httpResponse.Content.ReadAsStringAsync();
         if (!string.IsNullOrWhiteSpace(content))
         {
           message.AppendLine();
@@ -252,9 +224,6 @@ namespace Csla.Channels.Http
     }
 
 #pragma warning disable SYSLIB0014
-#if NET8_0_OR_GREATER
-    [UnsupportedOSPlatform("browser")]
-#endif
     private class DefaultWebClient : WebClient
     {
       private int Timeout { get; set; }

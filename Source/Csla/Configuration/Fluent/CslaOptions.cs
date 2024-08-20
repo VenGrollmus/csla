@@ -23,13 +23,18 @@ namespace Csla.Configuration
     {
       Services = services;
       DataPortalOptions = new DataPortalOptions(this);
-      SerializationOptions = new SerializationOptions(this);
     }
 
     /// <summary>
     /// Gets a reference to the current services collection.
     /// </summary>
-    public IServiceCollection Services { get; }
+    public IServiceCollection Services { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the type for the IContextManager to
+    /// be used by ApplicationContext.
+    /// </summary>
+    public Type ContextManagerType { get; set; }
 
     /// <summary>
     /// Sets a value indicating whether CSLA
@@ -61,26 +66,26 @@ namespace Csla.Configuration
     /// <summary>
     /// Gets the SecurityOptions instance.
     /// </summary>
-    internal SecurityOptions SecurityOptions { get; } = new SecurityOptions();
+    internal SecurityOptions SecurityOptions { get; private set; } = new SecurityOptions();
     /// <summary>
     /// Gets the SerializationOptions instance.
     /// </summary>
-    public SerializationOptions SerializationOptions { get; }
+    internal SerializationOptions SerializationOptions { get; private set; } = new SerializationOptions();
     /// <summary>
     /// Gets the DataPortalClientOptions instance.
     /// </summary>
-    internal DataPortalOptions DataPortalOptions { get; }
+    internal DataPortalOptions DataPortalOptions { get; private set; }
     /// <summary>
     /// Gets the DataOptions instance.
     /// </summary>
-    public DataOptions DataOptions { get; } = new DataOptions();
+    public DataOptions DataOptions { get; private set; } = new DataOptions();
     /// <summary>
     /// Gets the DataOptions instance.
     /// </summary>
-    public BindingOptions BindingOptions { get; } = new BindingOptions();
+    public BindingOptions BindingOptions { get; private set; } = new BindingOptions();
     /// <summary>
     /// Gets the CoreOptions instance.
     /// </summary>
-    internal CoreOptions CoreOptions { get; } = new CoreOptions();
+    internal CoreOptions CoreOptions { get; private set; } = new CoreOptions();
   }
 }

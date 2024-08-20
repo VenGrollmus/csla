@@ -33,7 +33,7 @@ namespace Csla.Test.IO
     [TestCategory("SkipWhenLiveUnitTesting")]
     public void SaveNewRoot()
     {
-      Basic.Root root = NewRoot();
+      Csla.Test.Basic.Root root = NewRoot();
 
       root.Data = "saved";
       Assert.AreEqual("saved", root.Data);
@@ -56,7 +56,7 @@ namespace Csla.Test.IO
     [TestCategory("SkipWhenLiveUnitTesting")]
     public void SaveOldRoot()
     {
-      Basic.Root root = GetRoot("old");
+      Csla.Test.Basic.Root root = GetRoot("old");
 
       root.Data = "saved";
       Assert.AreEqual("saved", root.Data);
@@ -78,7 +78,7 @@ namespace Csla.Test.IO
     [TestCategory("SkipWhenLiveUnitTesting")]
     public void LoadRoot()
     {
-      Basic.Root root = GetRoot("loaded");
+      Csla.Test.Basic.Root root = GetRoot("loaded");
       Assert.IsNotNull(root);
       Assert.AreEqual("Fetched", TestResults.GetResult("Root"));
       Assert.AreEqual("loaded", root.Data);
@@ -92,7 +92,7 @@ namespace Csla.Test.IO
     [TestCategory("SkipWhenLiveUnitTesting")]
     public void DeleteNewRoot()
     {
-      Basic.Root root = NewRoot();
+      Csla.Test.Basic.Root root = NewRoot();
 
       TestResults.Reinitialise();
       root.Delete();
@@ -112,7 +112,7 @@ namespace Csla.Test.IO
     [TestCategory("SkipWhenLiveUnitTesting")]
     public void DeleteOldRoot()
     {
-      Basic.Root root = GetRoot("old");
+      Csla.Test.Basic.Root root = GetRoot("old");
 
       TestResults.Reinitialise();
       root.Delete();

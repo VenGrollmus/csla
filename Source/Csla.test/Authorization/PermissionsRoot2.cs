@@ -14,7 +14,7 @@ namespace Csla.Test.Security
 #if TESTING
     [DebuggerNonUserCode]
 #endif
-  [Serializable]
+  [Serializable()]
   public class PermissionsRoot2 : BusinessBase<PermissionsRoot2>
   {
     private int _ID = 0;
@@ -51,7 +51,7 @@ namespace Csla.Test.Security
       }
     }
 
-    public readonly static Core.IMemberInfo DoWorkMethod = RegisterMethod(typeof(PermissionsRoot), "DoWork");
+    public readonly static Csla.Core.IMemberInfo DoWorkMethod = RegisterMethod(typeof(PermissionsRoot), "DoWork");
 
     public void DoWork()
     {
@@ -70,16 +70,16 @@ namespace Csla.Test.Security
 
     protected override void AddBusinessRules()
     {
-      BusinessRules.AddRule(new IsInRole(AuthorizationActions.ReadProperty, FirstNameProperty, new List<string> { "Admin" }));
-      BusinessRules.AddRule(new IsInRole(AuthorizationActions.WriteProperty, FirstNameProperty, new List<string> { "Admin" }));
-      BusinessRules.AddRule(new IsInRole(AuthorizationActions.ExecuteMethod, DoWorkMethod, new List<string> { "Admin" }));
+      BusinessRules.AddRule(new Csla.Rules.CommonRules.IsInRole(Rules.AuthorizationActions.ReadProperty, FirstNameProperty, new List<string> { "Admin" }));
+      BusinessRules.AddRule(new Csla.Rules.CommonRules.IsInRole(Rules.AuthorizationActions.WriteProperty, FirstNameProperty, new List<string> { "Admin" }));
+      BusinessRules.AddRule(new Csla.Rules.CommonRules.IsInRole(Rules.AuthorizationActions.ExecuteMethod, DoWorkMethod, new List<string> { "Admin" }));
     }
 
     #endregion
 
     #region "Criteria"
 
-    [Serializable]
+    [Serializable()]
     private class Criteria
     {
       //implement
@@ -87,7 +87,7 @@ namespace Csla.Test.Security
 
     #endregion
 
-    [RunLocal]
+    [RunLocal()]
     [Create]
     protected void DataPortal_Create()
     {

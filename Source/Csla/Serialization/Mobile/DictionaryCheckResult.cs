@@ -11,8 +11,8 @@ namespace Csla.Serialization.Mobile
   {
     internal DictionaryCheckResult(bool isNew, int key)
     {
-      IsNew = isNew;
-      Key = key;
+      this.IsNew = isNew;
+      this.Key = key;
     }
 
     /// <summary>

@@ -6,8 +6,11 @@
 // <summary>Static, dictionary-style container for test results</summary>
 //-----------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Csla.Test
 {
+
   /// <summary>
   /// Static dictionary-like class that offers similar functionality to GlobalContext
   /// This is used in tests to record the completion of operations, for testing that the operation occurred

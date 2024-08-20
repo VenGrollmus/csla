@@ -10,31 +10,31 @@ using System.Data;
 
 namespace Csla.Test.Basic
 {
-  [Serializable]
-  public class Children : BusinessListBase<Children, Child>
-  {
-    public void Add(string data)
+    [Serializable()]
+    public class Children : BusinessListBase<Children, Child>
     {
-      var child = AddNew();
-      child.Data = data;
-    }
+        public void Add(string data)
+        {
+            var child = this.AddNew();
+            child.Data = data;
+        }
 
-    internal void Update(IDbTransaction tr)
-    {
-      foreach (Child child in this)
-      {
-        child.Update(tr);
-      }
-    }
+        internal void Update(IDbTransaction tr)
+        {
+            foreach (Child child in this)
+            {
+                child.Update(tr);
+            }
+        }
 
-    public int DeletedCount
-    {
-      get { return DeletedList.Count; }
-    }
+        public int DeletedCount
+        {
+          get { return this.DeletedList.Count; }
+        }
 
-    public List<Child> GetDeletedList()
-    {
-      return DeletedList;
+        public List<Child> GetDeletedList()
+        {
+          return this.DeletedList;
+        }
     }
-  }
 }

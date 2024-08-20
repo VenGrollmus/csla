@@ -15,7 +15,7 @@ namespace Csla.Core
   /// and INotifyPropertyChanging in a 
   /// serialization-safe manner.
   /// </summary>
-  [Serializable]
+  [Serializable()]
   public abstract class BindableBase : 
     MobileObject, 
     INotifyPropertyChanged, 
@@ -27,7 +27,7 @@ namespace Csla.Core
     protected BindableBase()
     { }
 
-    [NonSerialized]
+    [NonSerialized()]
     private PropertyChangedEventHandler _nonSerializableChangedHandlers;
     private PropertyChangedEventHandler _serializableChangedHandlers;
 
@@ -42,19 +42,19 @@ namespace Csla.Core
       {
         if (ShouldHandlerSerialize(value))
           _serializableChangedHandlers = (PropertyChangedEventHandler)
-            Delegate.Combine(_serializableChangedHandlers, value);
+            System.Delegate.Combine(_serializableChangedHandlers, value);
         else
           _nonSerializableChangedHandlers = (PropertyChangedEventHandler)
-            Delegate.Combine(_nonSerializableChangedHandlers, value);
+            System.Delegate.Combine(_nonSerializableChangedHandlers, value);
       }
       remove
       {
           if (ShouldHandlerSerialize(value))
           _serializableChangedHandlers = (PropertyChangedEventHandler)
-            Delegate.Remove(_serializableChangedHandlers, value);
+            System.Delegate.Remove(_serializableChangedHandlers, value);
         else
           _nonSerializableChangedHandlers = (PropertyChangedEventHandler)
-            Delegate.Remove(_nonSerializableChangedHandlers, value);
+            System.Delegate.Remove(_nonSerializableChangedHandlers, value);
       }
     }
 
@@ -152,7 +152,7 @@ namespace Csla.Core
       OnPropertyChanged(string.Empty);
     }
 
-    [NonSerialized]
+    [NonSerialized()]
     private PropertyChangingEventHandler _nonSerializableChangingHandlers;
     private PropertyChangingEventHandler _serializableChangingHandlers;
 
@@ -167,19 +167,19 @@ namespace Csla.Core
       {
           if (ShouldHandlerSerialize(value))
           _serializableChangingHandlers = (PropertyChangingEventHandler)
-            Delegate.Combine(_serializableChangingHandlers, value);
+            System.Delegate.Combine(_serializableChangingHandlers, value);
         else
           _nonSerializableChangingHandlers = (PropertyChangingEventHandler)
-            Delegate.Combine(_nonSerializableChangingHandlers, value);
+            System.Delegate.Combine(_nonSerializableChangingHandlers, value);
       }
       remove
       {
           if (ShouldHandlerSerialize(value))
           _serializableChangingHandlers = (PropertyChangingEventHandler)
-            Delegate.Remove(_serializableChangingHandlers, value);
+            System.Delegate.Remove(_serializableChangingHandlers, value);
         else
           _nonSerializableChangingHandlers = (PropertyChangingEventHandler)
-            Delegate.Remove(_nonSerializableChangingHandlers, value);
+            System.Delegate.Remove(_nonSerializableChangingHandlers, value);
       }
     }
 

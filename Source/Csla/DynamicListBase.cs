@@ -39,18 +39,15 @@ namespace Csla
   /// Save() methods.
   /// </para>
   /// </remarks>
-  [Serializable]
+  [Serializable()]
   public abstract class DynamicListBase<T> :
-#if ANDROID || IOS
+#if (ANDROID || IOS) || NETFX_CORE
     ExtendedBindingList<T>,
 #else
     ObservableBindingList<T>,
 #endif
-    IParent,
-    Server.IDataPortalTarget,
-    IBusinessObject,
-    IUseApplicationContext
-    where T : IEditableBusinessObject, IUndoableObject, ISavable, IMobileObject, IBusinessObject
+    Core.IParent, Csla.Server.IDataPortalTarget, ISerializationNotification, IBusinessObject, IUseApplicationContext
+    where T : Core.IEditableBusinessObject, Core.IUndoableObject, Core.ISavable, IMobileObject, IBusinessObject
   {
     /// <summary>
     /// Creates an instance of the type.
@@ -120,7 +117,7 @@ namespace Csla
     /// <summary>
     /// Event raised when an object in the list has been saved.
     /// </summary>
-    public event EventHandler<SavedEventArgs> Saved;
+    public event EventHandler<Csla.Core.SavedEventArgs> Saved;
 
     /// <summary>
     /// Raises the Saved event.
@@ -312,18 +309,6 @@ namespace Csla
     }
 
     /// <summary>
-    /// Adds a new item to the list.
-    /// </summary>
-    /// <returns>The added object</returns>
-    protected override async Task<T> AddNewCoreAsync()
-    {
-      var dp = ApplicationContext.CreateInstanceDI<DataPortal<T>>();
-      T item = await dp.CreateAsync();
-      Add(item);
-      return item;
-    }
-
-    /// <summary>
     /// Gives the new object a parent reference to this
     /// list.
     /// </summary>
@@ -408,7 +393,7 @@ namespace Csla
     {
       // SL Data Grid's DataGridDataConnection object does not support replace action.  
       // It throws an excpetioon when this occurs.
-      if (RaiseListChangedEvents && (e.Action != NotifyCollectionChangedAction.Replace || RaiseReplaceEvents))
+      if (this.RaiseListChangedEvents && (e.Action != NotifyCollectionChangedAction.Replace || RaiseReplaceEvents))
         base.OnCollectionChanged(e);
     }
 
@@ -424,22 +409,22 @@ namespace Csla
       }
     }
 
-    void IParent.ApplyEditChild(IEditableBusinessObject child)
+    void Csla.Core.IParent.ApplyEditChild(Core.IEditableBusinessObject child)
     {
       if (child.EditLevel == 0)
         SaveItem((T)child);
     }
 
-    void IParent.RemoveChild(IEditableBusinessObject child)
+    void Csla.Core.IParent.RemoveChild(Core.IEditableBusinessObject child)
     {
       // do nothing, removal of a child is handled by
       // the RemoveItem override
     }
 
 
-    IParent Csla.Core.IParent.Parent
+    IParent  Csla.Core.IParent.Parent
     {
-      get { return null; }
+      get { return null;  }
     }
 
     #endregion
@@ -447,12 +432,23 @@ namespace Csla
     #region IsBusy
 
     /// <summary>
-    /// Await this method to ensure business object is not busy.
+    /// Await this method to ensure business object
+    /// is not busy running async rules.
     /// </summary>
     public async Task WaitForIdle()
     {
-      var cslaOptions = ApplicationContext.GetRequiredService<Configuration.CslaOptions>();
+      var cslaOptions = ApplicationContext.GetRequiredService<Csla.Configuration.CslaOptions>();
       await WaitForIdle(TimeSpan.FromSeconds(cslaOptions.DefaultWaitForIdleTimeoutInSeconds)).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Await this method to ensure business object
+    /// is not busy running async rules.
+    /// </summary>
+    /// <param name="timeout">Timeout duration</param>
+    public Task WaitForIdle(TimeSpan timeout)
+    {
+      return BusyHelper.WaitForIdle(this, timeout);
     }
 
     /// <summary>
@@ -474,6 +470,22 @@ namespace Csla
         return false;
       }
     }
+    #endregion
+
+    #region  Serialization Notification
+
+    /// <summary>
+    /// Set parent reference.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    protected override void OnDeserialized()
+    {
+      foreach (IEditableBusinessObject child in this)
+        child.SetParent(this);
+
+      base.OnDeserialized();
+    }
+
     #endregion
 
     #region  Data Access
@@ -543,42 +555,42 @@ namespace Csla
 
     #region IDataPortalTarget Members
 
-    void Server.IDataPortalTarget.CheckRules()
+    void Csla.Server.IDataPortalTarget.CheckRules()
     { }
 
-    Task Server.IDataPortalTarget.CheckRulesAsync() => Task.CompletedTask;
+    Task Csla.Server.IDataPortalTarget.CheckRulesAsync() => Task.CompletedTask;
 
-    void Server.IDataPortalTarget.MarkAsChild()
+    void Csla.Server.IDataPortalTarget.MarkAsChild()
     { }
 
-    void Server.IDataPortalTarget.MarkNew()
+    void Csla.Server.IDataPortalTarget.MarkNew()
     { }
 
-    void Server.IDataPortalTarget.MarkOld()
+    void Csla.Server.IDataPortalTarget.MarkOld()
     { }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalInvoke(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalInvoke(DataPortalEventArgs e)
     {
-      DataPortal_OnDataPortalInvoke(e);
+      this.DataPortal_OnDataPortalInvoke(e);
     }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalInvokeComplete(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalInvokeComplete(DataPortalEventArgs e)
     {
-      DataPortal_OnDataPortalInvokeComplete(e);
+      this.DataPortal_OnDataPortalInvokeComplete(e);
     }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalException(DataPortalEventArgs e, Exception ex)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalException(DataPortalEventArgs e, Exception ex)
     {
-      DataPortal_OnDataPortalException(e, ex);
+      this.DataPortal_OnDataPortalException(e, ex);
     }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalInvoke(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalInvoke(DataPortalEventArgs e)
     { }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalInvokeComplete(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalInvokeComplete(DataPortalEventArgs e)
     { }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalException(DataPortalEventArgs e, Exception ex)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalException(DataPortalEventArgs e, Exception ex)
     { }
 
     #endregion

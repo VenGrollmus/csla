@@ -10,26 +10,26 @@ using System.Data;
 
 namespace Csla.Test.Basic
 {
-  [Serializable]
-  public class GrandChildren : BusinessListBase<GrandChildren, GrandChild>
-  {
-    public void Add(string data)
+    [Serializable()]
+    public class GrandChildren : BusinessListBase<GrandChildren, GrandChild>
     {
-      var grandChild = AddNew();
-      grandChild.Data = data;
-    }
+        public void Add(string data)
+        {
+            var grandChild = this.AddNew();
+            grandChild.Data = data;
+        }
 
-    internal void Update(IDbTransaction tr)
-    {
-      foreach (GrandChild child in this)
-      {
-        child.Update(tr);
-      }
-    }
+        internal void Update(IDbTransaction tr)
+        {
+            foreach (GrandChild child in this)
+            {
+                child.Update(tr);
+            }
+        }
 
-    public GrandChildren()
-    {
-      MarkAsChild();
+        public GrandChildren()
+        {
+            MarkAsChild();
+        }
     }
-  }
 }

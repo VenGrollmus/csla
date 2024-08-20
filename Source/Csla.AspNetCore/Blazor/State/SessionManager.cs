@@ -39,14 +39,15 @@ namespace Csla.Blazor.State
     /// Updates the current user's session data.
     /// </summary>
     /// <param name="newSession">Current user session data</param>
-    /// <exception cref="ArgumentNullException"><paramref name="newSession"/> is <see langword="null"/>.</exception>
     public void UpdateSession(Session newSession)
     {
-      ArgumentNullException.ThrowIfNull(newSession);
-      var key = _sessionIdManager.GetSessionId();
-      var existingSession = _sessions[key];
-      Replace(newSession, existingSession);
-      existingSession.Touch();
+      if (newSession != null)
+      {
+        var key = _sessionIdManager.GetSessionId();
+        var existingSession = _sessions[key];
+        Replace(newSession, existingSession);
+        existingSession.Touch();
+      }
     }
 
     /// <summary>
@@ -78,10 +79,8 @@ namespace Csla.Blazor.State
     }
 
     // wasm client-side methods
-    Task<Session> ISessionManager.RetrieveSession(TimeSpan timeout) => throw new NotImplementedException();
+    Task<Session> ISessionManager.RetrieveSession() => throw new NotImplementedException();
     Session ISessionManager.GetCachedSession() => throw new NotImplementedException();
-    Task ISessionManager.SendSession(TimeSpan timeout) => throw new NotImplementedException();
-    Task<Session> ISessionManager.RetrieveSession(CancellationToken ct) => throw new NotImplementedException();
-    Task ISessionManager.SendSession(CancellationToken ct) => throw new NotImplementedException();
+    Task ISessionManager.SendSession() => throw new NotImplementedException();
   }
 }

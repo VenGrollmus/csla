@@ -113,12 +113,12 @@ namespace Csla.Server.Hosts.DataPortalChannel
     public DataPortalErrorInfo(ApplicationContext applicationContext, Exception ex)
     {
       ApplicationContext = applicationContext;
-      ExceptionTypeName = ex.GetType().FullName;
-      Message = ex.Message;
-      StackTrace = ex.StackTrace;
-      Source = ex.Source;
+      this.ExceptionTypeName = ex.GetType().FullName;
+      this.Message = ex.Message;
+      this.StackTrace = ex.StackTrace;
+      this.Source = ex.Source;
       if (ex.InnerException != null)
-        InnerError = ApplicationContext.CreateInstance<DataPortalErrorInfo>(ApplicationContext, ex.InnerException);
+        this.InnerError = ApplicationContext.CreateInstance<DataPortalErrorInfo>(ApplicationContext, ex.InnerException);
     }
 
     /// <summary>

@@ -8,20 +8,20 @@
 
 namespace Csla.Test.Serialization
 {
-  public class nonSerializableEventHandler
-  {
-    private int _count;
-
-    public void Reg(Core.BusinessBase obj)
+    public class nonSerializableEventHandler
     {
-      obj.PropertyChanged += obj_PropertyChanged;
-    }
+        private int _count = 0;
 
-    public void obj_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-      _count += 1;
-      Console.WriteLine(_count.ToString());
-      TestResults.AddOrOverwrite("PropertyChangedFiredCount", _count.ToString());
+        public void Reg(Csla.Core.BusinessBase obj)
+        {
+            obj.PropertyChanged += obj_PropertyChanged;
+        }
+
+        public void obj_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            _count += 1;
+            Console.WriteLine(_count.ToString());
+            TestResults.AddOrOverwrite("PropertyChangedFiredCount", _count.ToString());
+        }
     }
-  }
 }

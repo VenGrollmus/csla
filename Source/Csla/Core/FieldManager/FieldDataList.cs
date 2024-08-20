@@ -11,15 +11,15 @@ using System.Runtime.Serialization;
 namespace Csla.Core.FieldManager
 {
   [Serializable]
-#if (ANDROID || IOS)
+#if (ANDROID || IOS) || NETFX_CORE
   internal class FieldDataList : Csla.Core.MobileObject, Csla.Serialization.Mobile.ISerializationNotification
 #else
   internal class FieldDataList : ISerializable
 #endif
   {
-    [NonSerialized]
+    [NonSerialized()]
     private Dictionary<string, int> _fieldIndex = [];
-#if ANDROID || IOS
+#if (ANDROID || IOS) || NETFX_CORE
     private Csla.Core.MobileBindingList<IFieldData> _fields = new Csla.Core.MobileBindingList<IFieldData>();
 #else
     private List<IFieldData> _fields = [];
@@ -67,7 +67,7 @@ namespace Csla.Core.FieldManager
       return null;
     }
 
-#if ANDROID || IOS
+#if (ANDROID || IOS) || NETFX_CORE
     public Csla.Core.MobileBindingList<IFieldData> GetFieldDataList()
     {
       return _fields;
@@ -79,7 +79,7 @@ namespace Csla.Core.FieldManager
     }
 #endif
 
-#if ANDROID || IOS
+#if (ANDROID || IOS) || NETFX_CORE
     #region ISerializationNotification Members
 
     void Csla.Serialization.Mobile.ISerializationNotification.Deserialized()
@@ -101,13 +101,13 @@ namespace Csla.Core.FieldManager
 #else
     #region  ISerializable
 
-    protected FieldDataList(SerializationInfo info, StreamingContext context)
+    protected FieldDataList(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
     {
       _fields = (List<IFieldData>)(info.GetValue("Fields", typeof(List<IFieldData>)));
       RebuildIndex();
     }
 
-    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    public void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
     {
       info.AddValue("Fields", _fields);
     }

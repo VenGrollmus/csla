@@ -1,44 +1,17 @@
-﻿using Csla.Analyzers.Properties;
-using Microsoft.CodeAnalysis;
-
-namespace Csla.Analyzers
+﻿namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   public static class IsOperationMethodPublicAnalyzerConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Title = new LocalizableResourceString(nameof(Resources.IsOperationMethodPublic_Title), Resources.ResourceManager, typeof(Resources));
-
-    /// <summary>
-    /// 
-    /// </summary>
+    public const string Title = "Find CSLA Operations That are Public";
+    public const string IdentifierText = "IsOperationMethodPublic";
     public const string IsSealed = "IsSealed";
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Message = new LocalizableResourceString(nameof(Resources.IsOperationMethodPublic_Message), Resources.ResourceManager, typeof(Resources));
+    public const string Message = "CSLA operations should not be public";
   }
 
-  /// <summary>
-  /// 
-  /// </summary>
   public static class IsOperationMethodPublicAnalyzerMakeNonPublicCodeFixConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static string InternalDescription => Resources.IsOperationMethodPublic_InternalDescription;
-    /// <summary>
-    /// 
-    /// </summary>
-    public static string ProtectedDescription => Resources.IsOperationMethodPublic_ProtectedDescription;
-    /// <summary>
-    /// 
-    /// </summary>
-    public static string PrivateDescription => Resources.IsOperationMethodPublic_PrivateDescription;
+    public const string InternalDescription = "Make CSLA operation internal";
+    public const string ProtectedDescription = "Make CSLA operation protected";
+    public const string PrivateDescription = "Make CSLA operation private";
   }
 }

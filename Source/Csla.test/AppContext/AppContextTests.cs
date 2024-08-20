@@ -7,16 +7,13 @@
 //-----------------------------------------------------------------------
 
 using Csla.Configuration;
-using Csla.Core;
 using Csla.TestHelpers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Csla.Test.AppContext
 {
-  [TestClass]
+  [TestClass()]
   public class AppContextTests
   {
     private static TestDIContext _testDIContext;
@@ -34,32 +31,19 @@ namespace Csla.Test.AppContext
     }
 
     [TestMethod]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void UseDefaultApplicationContextManager()
+    public void UseCustomApplicationContext()
     {
       var services = new ServiceCollection();
-      services.AddCsla();
-      var mgrs = services.Where(s => s.ServiceType == typeof(IContextManager));
-      Assert.AreEqual(0, mgrs.Count(), "No context manager should be registered");
-
+      services.AddCsla(o => o.ContextManagerType = typeof(Core.ApplicationContextManagerTls));
       var serviceProvider = services.BuildServiceProvider();
 
       var applicationContext = serviceProvider.GetRequiredService<ApplicationContext>();
+      Assert.IsInstanceOfType(applicationContext.ContextManager, typeof(Core.ApplicationContextManagerTls));
     }
 
-    [TestMethod]
-    public void UseCustomApplicationContextManager()
-    {
-      var services = new ServiceCollection();
-      services.AddCsla();
-      services.AddScoped<Csla.Core.IContextManager, ApplicationContextManagerTls>();
-      var serviceProvider = services.BuildServiceProvider();
+    #region Simple Test
 
-      var applicationContext = serviceProvider.GetRequiredService<ApplicationContext>();
-      Assert.IsInstanceOfType(applicationContext.ContextManager, typeof(ApplicationContextManagerTls));
-    }
-
-    [TestMethod]
+    [TestMethod()]
     public void SimpleTest()
     {
       IDataPortal<SimpleRoot> dataPortal = _testDIContext.CreateDataPortal<SimpleRoot>();
@@ -73,6 +57,10 @@ namespace Csla.Test.AppContext
       Assert.AreEqual("Fetched", TestResults.GetResult("Root"), "global context missing server value");
     }
 
+    #endregion
+
+    #region ClientContext
+
     /// <summary>
     /// Test the Client Context
     /// </summary>
@@ -80,7 +68,7 @@ namespace Csla.Test.AppContext
     /// Clearing the GlobalContext clears the ClientContext also? 
     /// Should the ClientContext be cleared explicitly also?
     /// </remarks>
-    [TestMethod]
+    [TestMethod()]
     [TestCategory("SkipOnCIServer")]
     public void ClientContext()
     {
@@ -113,82 +101,14 @@ namespace Csla.Test.AppContext
       Assert.AreEqual("new global value", TestResults.GetResult("globalcontext"), "New global value lost");
     }
 
-    /// <summary>
-    /// Tests the addition of a key-value pair to the ContextDictionary.
-    /// This method verifies that a new key-value pair can be successfully added
-    /// and subsequently retrieved from the ContextDictionary, ensuring the dictionary's
-    /// add functionality works as expected.
-    /// </summary>
-    [TestMethod]
-    public void ContextDictionaryAdd()
-    {
-      var contextDectionary = new ContextDictionary();
-      string key = "key1";
-      string value = "value1";
-
-      contextDectionary.Add(key, value);
-
-      Assert.AreEqual(value, contextDectionary[key]);
-    }
-
-    /// <summary>
-    /// Tests that adding a duplicate key to the ContextDictionary throws the correct exception.
-    /// This method verifies that the ContextDictionary enforces unique keys by attempting to add
-    /// a key-value pair where the key already exists in the dictionary. The expected behavior is
-    /// that an ArgumentException is thrown, indicating the key's presence and preventing the addition.
-    /// </summary>
-    [TestMethod]
-    public void ContextDictionaryAddThrowsCorrectException()
-    {
-      var contextDectionary = new ContextDictionary();
-      string key = "key1";
-      string value = "value1";
-
-      contextDectionary[key] = value;
-
-      Assert.ThrowsException<System.ArgumentException>(() => contextDectionary.Add(key, value));
-    }
-
-    /// <summary>
-    /// Tests the removal of a key-value pair from the ContextDictionary.
-    /// This method verifies that a key-value pair can be successfully removed from the ContextDictionary,
-    /// ensuring the dictionary's remove functionality works as expected. It adds a key-value pair, removes it,
-    /// and then checks that the key no longer exists in the dictionary.
-    /// </summary>
-    [TestMethod]
-    public void ContextDictionaryRemove()
-    {
-      var contextDectionary = new ContextDictionary();
-      string key = "key1";
-      string value = "value1";
-
-
-      contextDectionary[key] = value;
-      contextDectionary.Remove(key);
-
-      Assert.IsFalse(contextDectionary.ContainsKey(key));
-    }
-
-    /// <summary>
-    /// Tests that attempting to remove a non-existent key from the ContextDictionary throws the correct exception.
-    /// This method verifies the dictionary's behavior when a removal operation is attempted for a key that does not exist.
-    /// The expected behavior is that a NotSupportedException is thrown, indicating that the operation is not supported
-    /// for keys that are not present in the dictionary.
-    /// </summary>
-    [TestMethod]
-    public void ContextDictionaryRemoveThrowsCorrectException()
-    {
-      var contextDictionary = new ContextDictionary();
-      string key = "key1";
-      Assert.ThrowsException<System.NotSupportedException>(() => contextDictionary.Remove(key));
-    }
+    #endregion
 
     #region FailCreateContext
 
     /// <summary>
     /// Test the FaileCreate Context
     /// </summary>
-    [TestMethod]
+    [TestMethod()]
     public void FailCreateContext()
     {
       IDataPortal<ExceptionRoot> dataPortal = _testDIContext.CreateDataPortal<ExceptionRoot>();
@@ -213,7 +133,7 @@ namespace Csla.Test.AppContext
 
     #region FailFetchContext
 
-    [TestMethod]
+    [TestMethod()]
     public void FailFetchContext()
     {
       IDataPortal<ExceptionRoot> dataPortal = _testDIContext.CreateDataPortal<ExceptionRoot>();
@@ -240,7 +160,7 @@ namespace Csla.Test.AppContext
 
     #endregion
 
-    [TestMethod]
+    [TestMethod()]
     public void FailUpdateContext()
     {
       TestDIContext testDIContext = TestDIContextFactory.CreateContext(opts => opts.
@@ -271,7 +191,7 @@ namespace Csla.Test.AppContext
 
     #region FailDeleteContext
 
-    [TestMethod]
+    [TestMethod()]
     public void FailDeleteContext()
     {
       IDataPortal<ExceptionRoot> dataPortal = _testDIContext.CreateDataPortal<ExceptionRoot>();

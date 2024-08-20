@@ -6,9 +6,6 @@
 // <summary>Implements the server-side Serviced </summary>
 //-----------------------------------------------------------------------
 
-#if NET8_0_OR_GREATER
-using System.Runtime.Versioning;
-#endif
 using System.Transactions;
 
 namespace Csla.Server
@@ -17,9 +14,6 @@ namespace Csla.Server
   /// Implements the server-side Serviced 
   /// DataPortal described in Chapter 4.
   /// </summary>
-#if NET8_0_OR_GREATER
-    [UnsupportedOSPlatform("browser")]
-#endif
   public class TransactionalDataPortal : IDataPortalServer
   {
     private readonly DataPortalBroker _portal;
@@ -60,9 +54,12 @@ namespace Csla.Server
     public async Task<DataPortalResult> Create(
       Type objectType, object criteria, DataPortalContext context, bool isSync)
     {
-      using TransactionScope tr = CreateTransactionScope();
-      var result = await _portal.Create(objectType, criteria, context, isSync).ConfigureAwait(false);
-      tr.Complete();
+      DataPortalResult result;
+      using (TransactionScope tr = CreateTransactionScope())
+      {
+        result = await _portal.Create(objectType, criteria, context, isSync).ConfigureAwait(false);
+        tr.Complete();
+      }
       return result;
     }
 
@@ -118,9 +115,12 @@ namespace Csla.Server
     /// <returns>A populated business object.</returns>
     public async Task<DataPortalResult> Fetch(Type objectType, object criteria, DataPortalContext context, bool isSync)
     {
-      using TransactionScope tr = CreateTransactionScope();
-      var result = await _portal.Fetch(objectType, criteria, context, isSync).ConfigureAwait(false);
-      tr.Complete();
+      DataPortalResult result;
+      using (TransactionScope tr = CreateTransactionScope())
+      {
+        result = await _portal.Fetch(objectType, criteria, context, isSync).ConfigureAwait(false);
+        tr.Complete();
+      }
       return result;
     }
 
@@ -141,9 +141,12 @@ namespace Csla.Server
     /// <returns>A reference to the newly updated object.</returns>
     public async Task<DataPortalResult> Update(object obj, DataPortalContext context, bool isSync)
     {
-      using TransactionScope tr = CreateTransactionScope();
-      var result = await _portal.Update(obj, context, isSync).ConfigureAwait(false);
-      tr.Complete();
+      DataPortalResult result;
+      using (TransactionScope tr = CreateTransactionScope())
+      {
+        result = await _portal.Update(obj, context, isSync).ConfigureAwait(false);
+        tr.Complete();
+      }
       return result;
     }
 
@@ -164,9 +167,12 @@ namespace Csla.Server
     /// <param name="isSync">True if the client-side proxy should synchronously invoke the server.</param>
     public async Task<DataPortalResult> Delete(Type objectType, object criteria, DataPortalContext context, bool isSync)
     {
-      using TransactionScope tr = CreateTransactionScope();
-      var result = await _portal.Delete(objectType, criteria, context, isSync).ConfigureAwait(false);
-      tr.Complete();
+      DataPortalResult result;
+      using (TransactionScope tr = CreateTransactionScope())
+      {
+        result = await _portal.Delete(objectType, criteria, context, isSync).ConfigureAwait(false);
+        tr.Complete();
+      }
       return result;
     }
   }

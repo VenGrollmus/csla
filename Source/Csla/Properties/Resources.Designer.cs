@@ -529,24 +529,6 @@ namespace Csla.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An element with the same key already exists in the dictionary object..
-        /// </summary>
-        public static string KeyAlreadyExistsException {
-            get {
-                return ResourceManager.GetString("KeyAlreadyExistsException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Key is null..
-        /// </summary>
-        public static string KeyDoesNotExistException {
-            get {
-                return ResourceManager.GetString("KeyDoesNotExistException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to List item must be marked as a child object.
         /// </summary>
         public static string ListItemNotAChildException {
@@ -970,15 +952,6 @@ namespace Csla.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The session id must be not null..
-        /// </summary>
-        public static string SessionIdManagerIdMustBeNotNull {
-            get {
-                return ResourceManager.GetString("SessionIdManagerIdMustBeNotNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to t.
         /// </summary>
         public static string SmartDateT {
@@ -1069,15 +1042,6 @@ namespace Csla.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} must not be null, empty or only consisting of white spaces..
-        /// </summary>
-        public static string StringNotNullOrWhiteSpaceException {
-            get {
-                return ResourceManager.GetString("StringNotNullOrWhiteSpaceException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} required.
         /// </summary>
         public static string StringRequiredRule {
@@ -1105,29 +1069,11 @@ namespace Csla.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SyncRoot NotSupported.
-        /// </summary>
-        public static string SyncrootNotSupportedException {
-            get {
-                return ResourceManager.GetString("SyncrootNotSupportedException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Method {0} must return Task&lt;object&gt;.
         /// </summary>
         public static string TaskOfObjectException {
             get {
                 return ResourceManager.GetString("TaskOfObjectException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Transactions with TransactionTypes.TransactionScope are not supported in the browser platform.
-        /// </summary>
-        public static string TransactionScopeTransactionNotSupportedException {
-            get {
-                return ResourceManager.GetString("TransactionScopeTransactionNotSupportedException", resourceCulture);
             }
         }
         

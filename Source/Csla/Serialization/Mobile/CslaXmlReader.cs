@@ -16,9 +16,14 @@ namespace Csla.Serialization.Mobile
     /// <returns>List of SerializationInfo objects</returns>
     public List<SerializationInfo> Read(Stream serializationStream)
     {
-      using var xmlReader = XmlReader.Create(serializationStream);
-      var dataContractSerializer = CslaReaderWriterFactory.GetDataContractSerializer();
-      return (List<SerializationInfo>)dataContractSerializer.ReadObject(xmlReader);
+      List<SerializationInfo> returnValue = null;
+      using (var xmlReader = XmlReader.Create(serializationStream))
+      {
+        DataContractSerializer dataContractSerializer = CslaReaderWriterFactory.GetDataContractSerializer();
+        returnValue = (List<SerializationInfo>)dataContractSerializer.ReadObject(xmlReader);
+      }
+
+      return returnValue;
     }
   }
 }

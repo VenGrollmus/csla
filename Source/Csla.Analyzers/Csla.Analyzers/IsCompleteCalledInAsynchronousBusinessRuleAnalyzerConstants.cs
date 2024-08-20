@@ -1,32 +1,14 @@
-﻿using Csla.Analyzers.Properties;
-using Microsoft.CodeAnalysis;
-
-namespace Csla.Analyzers
+﻿namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   public static class IsCompleteCalledInAsynchronousBusinessRuleConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Title = new LocalizableResourceString(nameof(Resources.IsCompleteCalledInAsynchronousBusinessRule_Title), Resources.ResourceManager, typeof(Resources));
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Message = new LocalizableResourceString(nameof(Resources.IsCompleteCalledInAsynchronousBusinessRule_Message), Resources.ResourceManager, typeof(Resources));
+    public const string Title = "Find Calls to Complete() in Asynchronous Business Rules";
+    public const string IdentifierText = "FindCompleteCallsInAsynchronousBusinessRules";
+    public const string Message = "Complete() should not be called in an asynchronous business rule";
   }
 
-  /// <summary>
-  /// 
-  /// </summary>
   public static class IsCompleteCalledInAsynchronousBusinessRuleCodeFixConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static string RemoveCompleteCalls => Resources.IsCompleteCalledInAsynchronousBusinessRule_RemoveCompleteCalls;
+    public const string RemoveCompleteCalls = "Remove Complete() calls";
   }
 }

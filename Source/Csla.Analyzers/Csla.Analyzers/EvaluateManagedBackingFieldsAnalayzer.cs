@@ -7,9 +7,6 @@ using static Csla.Analyzers.Extensions.ITypeSymbolExtensions;
 
 namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   [DiagnosticAnalyzer(LanguageNames.CSharp)]
   public sealed class EvaluateManagedBackingFieldsAnalayzer
     : DiagnosticAnalyzer
@@ -23,15 +20,9 @@ namespace Csla.Analyzers
         helpLinkUri: HelpUrlBuilder.Build(
           Constants.AnalyzerIdentifiers.EvaluateManagedBackingFields, nameof(EvaluateManagedBackingFieldsAnalayzer)));
 
-    /// <summary>
-    /// 
-    /// </summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
       ImmutableArray.Create(mustBePublicStaticAndReadonlyRule);
 
-    /// <summary>
-    /// 
-    /// </summary>
     public override void Initialize(AnalysisContext context)
     {
       context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);

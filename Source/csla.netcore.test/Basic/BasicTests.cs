@@ -28,7 +28,7 @@ namespace Csla.Test.Basic
     {
       TestResults.Reinitialise();
 
-      DataBinding.ParentEntity p = CreateParentEntityInstance();
+      Csla.Test.DataBinding.ParentEntity p = CreateParentEntityInstance();
 
       p.NotUndoable = "something";
       p.Data = "data";
@@ -473,9 +473,9 @@ namespace Csla.Test.Basic
       return dataPortal.Create(new GenRootBase.Criteria());
     }
 
-    private DataBinding.ParentEntity CreateParentEntityInstance()
+    private Csla.Test.DataBinding.ParentEntity CreateParentEntityInstance()
     {
-      IDataPortal<DataBinding.ParentEntity> dataPortal = _testDIContext.CreateDataPortal<DataBinding.ParentEntity>();
+      IDataPortal<Csla.Test.DataBinding.ParentEntity> dataPortal = _testDIContext.CreateDataPortal<Csla.Test.DataBinding.ParentEntity>();
       return dataPortal.Create();
     }
 
@@ -493,23 +493,23 @@ namespace Csla.Test.Basic
 
     public FormSimulator(Core.BusinessBase obj)
     {
-      _obj.PropertyChanged += Obj_IsDirtyChanged;
-      _obj = obj;
+      this._obj.PropertyChanged += Obj_IsDirtyChanged;
+      this._obj = obj;
     }
 
     private void Obj_IsDirtyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     { }
   }
 
-  [Serializable]
+  [Serializable()]
   public class SerializableListener
   {
     private readonly Core.BusinessBase _obj;
 
     public SerializableListener(Core.BusinessBase obj)
     {
-      _obj.PropertyChanged += Obj_IsDirtyChanged;
-      _obj = obj;
+      this._obj.PropertyChanged += Obj_IsDirtyChanged;
+      this._obj = obj;
     }
 
     public void Obj_IsDirtyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

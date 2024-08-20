@@ -7,9 +7,6 @@ using System.Collections.Immutable;
 
 namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   [DiagnosticAnalyzer(LanguageNames.CSharp)]
   public sealed class FindOperationsWithNonSerializableArgumentsAnalyzer
     : DiagnosticAnalyzer
@@ -22,15 +19,9 @@ namespace Csla.Analyzers
         helpLinkUri: HelpUrlBuilder.Build(
           Constants.AnalyzerIdentifiers.FindOperationsWithNonSerializableArguments, nameof(FindOperationsWithNonSerializableArgumentsAnalyzer)));
 
-    /// <summary>
-    /// 
-    /// </summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
       ImmutableArray.Create(shouldUseSerializableTypesRule);
 
-    /// <summary>
-    /// 
-    /// </summary>
     public override void Initialize(AnalysisContext context)
     {
       context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
@@ -54,7 +45,7 @@ namespace Csla.Analyzers
               !argumentType.IsSerializableByMobileFormatter(context.Compilation) &&
               !argument.GetAttributes().Any(_ => _.AttributeClass.IsInjectable()) && 
               argumentType is not { ContainingNamespace.Name: "System", Name: "Nullable" } &&
-              argumentType is INamedTypeSymbol namedArgument)
+              argumentType is INamedTypeSymbol namedArgument && !namedArgument.IsSerializable)
           {
             context.ReportDiagnostic(Diagnostic.Create(
               shouldUseSerializableTypesRule, argument.Locations[0]));

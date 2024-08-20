@@ -6,10 +6,12 @@
 // <summary>Base class used to create ViewModel objects that</summary>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using System.Windows;
 using Csla.Core;
 using Csla.Rules;
@@ -37,7 +39,7 @@ namespace Csla.Xaml
     INotifyPropertyChanged, IViewModel
 #endif
   {
-    private ApplicationContext ApplicationContext { get => ApplicationContextManager.GetApplicationContext(); }
+    private ApplicationContext ApplicationContext { get => Csla.Xaml.ApplicationContextManager.GetApplicationContext(); }
 
 #if ANDROID || IOS || XAMARIN || WINDOWS_UWP || MAUI
     private T _model;
@@ -511,10 +513,10 @@ namespace Csla.Xaml
 
       Type sourceType = typeof(T);
 
-      CanCreateObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.CreateObject, sourceType);
-      CanGetObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.GetObject, sourceType);
-      CanEditObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.EditObject, sourceType);
-      CanDeleteObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.DeleteObject, sourceType);
+      CanCreateObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.CreateObject, sourceType);
+      CanGetObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.GetObject, sourceType);
+      CanEditObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.EditObject, sourceType);
+      CanDeleteObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.DeleteObject, sourceType);
 
       // call SetProperties to set "instance" values 
       OnSetProperties();
@@ -582,7 +584,7 @@ namespace Csla.Xaml
       {
         var saved = (T)await cloned.SaveAsync();
         if (Model is IEditableBusinessObject editable)
-          await new GraphMerger(ApplicationContext).MergeGraphAsync(editable, (IEditableBusinessObject)saved);
+          new GraphMerger(ApplicationContext).MergeGraph(editable, (IEditableBusinessObject)saved);
         else
           Model = saved;
       }

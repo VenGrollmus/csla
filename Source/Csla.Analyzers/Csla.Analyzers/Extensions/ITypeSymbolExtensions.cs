@@ -149,13 +149,5 @@ namespace Csla.Analyzers.Extensions
           @this.ContainingAssembly.Name == CslaMemberConstants.AssemblyName) ||
           (@this.BaseType.IsMobileObject() || @this.Interfaces.Any(_ => _.IsMobileObject())));
     }
-
-    internal static bool IsObjectAuthorizationRulesAttribute(this ITypeSymbol @this)
-    {
-      return @this != null &&
-        ((@this.Name == CslaMemberConstants.Types.ObjectAuthorizationRulesAttribute &&
-          @this.ContainingAssembly.Name == CslaMemberConstants.AssemblyName) ||
-          @this.BaseType.IsObjectAuthorizationRulesAttribute());
-    }
   }
 }

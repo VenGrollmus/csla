@@ -16,19 +16,19 @@ namespace cslalighttest.CslaDataProvider
 
     public Customer MyParent
     {
-      get { return (Customer)Parent; }
+      get { return (Customer)this.Parent; }
     }
 
     private CustomerContactList() { }
 
     private void Child_Fetch(int customerID, [Inject] IChildDataPortal<CustomerContact> childDataPortal)
     {
-      RaiseListChangedEvents = false;
+      this.RaiseListChangedEvents = false;
       for (int i = 1; i <= customerID; i++)
       {
-        Add(childDataPortal.FetchChild(customerID, i, $"First Name # {i}", $"Last Name # {i}", new DateTime(1980 + i, 1, 1)));
+        Add(childDataPortal.FetchChild(customerID, i, "First Name # " + i.ToString(), "Last Name # " + i.ToString(), new DateTime(1980 + i, 1, 1)));
       }
-      RaiseListChangedEvents = true;
+      this.RaiseListChangedEvents = true;
     }
   }
 }

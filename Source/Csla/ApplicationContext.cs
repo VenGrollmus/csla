@@ -79,14 +79,14 @@ namespace Csla
     /// the client and server.
     /// </para>
     /// </remarks>
-    public IContextDictionary LocalContext
+    public ContextDictionary LocalContext
     {
       get
       {
-        IContextDictionary ctx = ContextManager.GetLocalContext();
+        ContextDictionary ctx = ContextManager.GetLocalContext();
         if (ctx == null)
         {
-          ctx = new ContextDictionary();
+          ctx = [];
           ContextManager.SetLocalContext(ctx);
         }
         return ctx;
@@ -114,16 +114,16 @@ namespace Csla
     /// client setting (i.e. in your ASP.NET UI).
     /// </para>
     /// </remarks>
-    public IContextDictionary ClientContext
+    public ContextDictionary ClientContext
     {
       get
       {
         lock (_syncContext)
         {
-          IContextDictionary ctx = ContextManager.GetClientContext(ExecutionLocation);
+          ContextDictionary ctx = ContextManager.GetClientContext(ExecutionLocation);
           if (ctx == null)
           {
-            ctx = new ContextDictionary();
+            ctx = [];
             ContextManager.SetClientContext(ctx, ExecutionLocation);
           }
           return ctx;
@@ -131,7 +131,7 @@ namespace Csla
       }
     }
 
-    internal void SetContext(IContextDictionary clientContext)
+    internal void SetContext(ContextDictionary clientContext)
     {
       lock (_syncContext)
         ContextManager.SetClientContext(clientContext, ExecutionLocation);
@@ -182,6 +182,13 @@ namespace Csla
       Server
     }
 
+    /// <summary>
+    /// Gets the serialization formatter type used by CSLA .NET
+    /// for all explicit object serialization (such as cloning,
+    /// n-level undo, etc).
+    /// </summary>
+    public static Type SerializationFormatter { get; internal set; } = typeof(Serialization.Mobile.MobileFormatter);
+
     private PropertyChangedModes _propertyChangedMode;
     private bool _propertyChangedModeSet;
 
@@ -226,7 +233,7 @@ namespace Csla
     /// is currently executing on the client or server.
     /// </summary>
     public ExecutionLocations ExecutionLocation { get; private set; } =
-#if (ANDROID || IOS) && !NETSTANDARD
+#if (ANDROID || IOS || NETFX_CORE) && !NETSTANDARD
       ExecutionLocations.MobileClient;
 #else
       ExecutionLocations.Client;
@@ -251,7 +258,7 @@ namespace Csla
       get
       {
         var ruleSet = (string)ClientContext.GetValueOrNull("__ruleSet");
-        return string.IsNullOrEmpty(ruleSet) ? DefaultRuleSet : ruleSet;
+        return string.IsNullOrEmpty(ruleSet) ? ApplicationContext.DefaultRuleSet : ruleSet;
       }
       set
       {

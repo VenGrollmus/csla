@@ -63,9 +63,5 @@ namespace Csla.Blazor
     /// representing the property.
     /// </summary>
     System.Reflection.PropertyInfo GetPropertyInfo();
-    /// <summary>
-    /// Gets the value of the TextSeparator
-    /// </summary>
-    string TextSeparator { get;}
   }
 }

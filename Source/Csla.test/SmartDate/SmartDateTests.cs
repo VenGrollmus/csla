@@ -12,7 +12,7 @@ using Csla.TestHelpers;
 
 namespace Csla.Test.SmartDate
 {
-  [TestClass]
+  [TestClass()]
   public class SmartDateTests
   {
     private static TestDIContext _testDIContext;
@@ -30,24 +30,24 @@ namespace Csla.Test.SmartDate
     {
 
       // store current cultures
-      CurrentCulture = Thread.CurrentThread.CurrentCulture;
-      CurrentUICulture = Thread.CurrentThread.CurrentUICulture;
+      CurrentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+      CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
 
       // set to "en-US" for all tests
-      Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
-      Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+      System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+      System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
     }
 
     [TestCleanup]
     public void Cleanup()
     {
       // restore original cultures
-      Thread.CurrentThread.CurrentCulture = CurrentCulture;
-      Thread.CurrentThread.CurrentUICulture = CurrentUICulture;
+      System.Threading.Thread.CurrentThread.CurrentCulture = CurrentCulture;
+      System.Threading.Thread.CurrentThread.CurrentUICulture = CurrentUICulture;
     }
 
     #region Test Constructors
-    [TestMethod]
+    [TestMethod()]
     public void TestSmartDateConstructors()
     {
       DateTime now = DateTime.Now;
@@ -133,7 +133,7 @@ namespace Csla.Test.SmartDate
       }
       catch (Exception ex)
       {
-        Assert.IsTrue(ex is ArgumentException);
+        Assert.IsTrue(ex is System.ArgumentException);
       }
 
       d = Csla.SmartDate.StringToDate("");
@@ -191,7 +191,7 @@ namespace Csla.Test.SmartDate
 
 #if !WINDOWS_PHONE
     #region Add
-    [TestMethod]
+    [TestMethod()]
     public void Add()
     {
       Csla.SmartDate d2 = new Csla.SmartDate();
@@ -206,7 +206,7 @@ namespace Csla.Test.SmartDate
     #endregion
 
     #region Subtract
-    [TestMethod]
+    [TestMethod()]
     public void Subtract()
     {
       Csla.SmartDate d2 = new Csla.SmartDate();
@@ -223,7 +223,7 @@ namespace Csla.Test.SmartDate
 #endif
 
     #region Comparison
-    [TestMethod]
+    [TestMethod()]
     public void Comparison()
     {
       Csla.SmartDate d2 = new Csla.SmartDate(true);
@@ -232,7 +232,7 @@ namespace Csla.Test.SmartDate
       Csla.SmartDate d5 = new Csla.SmartDate(Csla.SmartDate.EmptyValue.MaxDate);
 
       Assert.IsTrue(d2.Equals(d3), "Empty dates should be equal");
-      Assert.IsTrue(Equals(d2, d3), "Empty dates should be equal (shared)");
+      Assert.IsTrue(Csla.SmartDate.Equals(d2, d3), "Empty dates should be equal (shared)");
       Assert.IsTrue(d2.Equals(d3), "Empty dates should be equal (unary)");
       Assert.IsTrue(d2.Equals(""), "Should be equal to an empty string (d2)");
       Assert.IsTrue(d3.Equals(""), "Should be equal to an empty string (d3)");
@@ -274,7 +274,7 @@ namespace Csla.Test.SmartDate
     #endregion
 
     #region Empty
-    [TestMethod]
+    [TestMethod()]
     public void Empty()
     {
       Csla.SmartDate d2 = new Csla.SmartDate();
@@ -291,15 +291,15 @@ namespace Csla.Test.SmartDate
       d3 = new Csla.SmartDate();
       Assert.AreEqual(0, d2.CompareTo(d3), "d2 and d3 should be the same");
       Assert.IsTrue(d2.Equals(d3), "d2 and d3 should be the same");
-      Assert.IsTrue(Equals(d2, d3), "d2 and d3 should be the same");
+      Assert.IsTrue(Csla.SmartDate.Equals(d2, d3), "d2 and d3 should be the same");
 
       d3.Date = DateTime.Now;
       Assert.AreEqual(-1, d2.CompareTo(d3), "d2 and d3 should not be the same");
       Assert.AreEqual(1, d3.CompareTo(d2), "d2 and d3 should not be the same");
       Assert.IsFalse(d2.Equals(d3), "d2 and d3 should not be the same");
-      Assert.IsFalse(Equals(d2, d3), "d2 and d3 should not be the same");
+      Assert.IsFalse(Csla.SmartDate.Equals(d2, d3), "d2 and d3 should not be the same");
       Assert.IsFalse(d3.Equals(d2), "d2 and d3 should not be the same");
-      Assert.IsFalse(Equals(d3, d2), "d2 and d3 should not be the same");
+      Assert.IsFalse(Csla.SmartDate.Equals(d3, d2), "d2 and d3 should not be the same");
     }
 
     [TestMethod]
@@ -319,7 +319,7 @@ namespace Csla.Test.SmartDate
     #endregion
 
     #region Comparison Operators
-    [TestMethod]
+    [TestMethod()]
     public void ComparisonOperators()
     {
       Csla.SmartDate d1 = new Csla.SmartDate();
@@ -394,7 +394,7 @@ namespace Csla.Test.SmartDate
     #endregion
 
     #region Serialization
-    [TestMethod]
+    [TestMethod()]
     public void SerializationTest()
     {
       Csla.SmartDate d2;
@@ -461,7 +461,7 @@ namespace Csla.Test.SmartDate
     [TestMethod]
     public void CustomParserReturnsDateTime()
     {
-      Csla.SmartDate.CustomParser = s =>
+      Csla.SmartDate.CustomParser = (s) =>
                                       {
                                         if (s == "test") return DateTime.Now;
                                         return null;

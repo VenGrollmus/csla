@@ -16,7 +16,7 @@ namespace Csla.Core.FieldManager
   /// Contains a field value and related metadata.
   /// </summary>
   /// <typeparam name="T">Type of field value contained.</typeparam>
-  [Serializable]
+  [Serializable()]
   public class FieldData<T> : IFieldData<T>
   {
     [NonSerialized]
@@ -66,14 +66,14 @@ namespace Csla.Core.FieldManager
     {
       get
       {
-        return Value;
+        return this.Value;
       }
       set
       {
         if (value == null)
-          Value = default(T);
+          this.Value = default(T);
         else
-          Value = (T)value;
+          this.Value = (T)value;
       }
     }
 
@@ -184,7 +184,7 @@ namespace Csla.Core.FieldManager
     /// </summary>
     [Browsable(false)]
     [Display(AutoGenerateField = false)]
-    [ScaffoldColumn(false)]
+    [System.ComponentModel.DataAnnotations.ScaffoldColumn(false)]
     public bool IsBusy
     {
       get

@@ -17,24 +17,26 @@ namespace Csla.Reflection
 
     public MethodCacheKey(string typeName, string methodName, Type[] paramTypes)
     {
-      TypeName = typeName;
-      MethodName = methodName;
-      ParamTypes = paramTypes;
+      this.TypeName = typeName;
+      this.MethodName = methodName;
+      this.ParamTypes = paramTypes;
 
       _hashKey = typeName.GetHashCode();
       _hashKey ^= methodName.GetHashCode();
       foreach (Type item in paramTypes)
-      {
+#if NETFX_CORE
+        _hashKey ^= item.Name().GetHashCode();
+#else
         _hashKey ^= item.Name.GetHashCode();
-      }
+#endif
     }
 
     public override bool Equals(object obj)
     {
       if (obj is MethodCacheKey key &&
-          key.TypeName == TypeName &&
-          key.MethodName == MethodName &&
-          ArrayEquals(key.ParamTypes, ParamTypes))
+          key.TypeName == this.TypeName &&
+          key.MethodName == this.MethodName &&
+          ArrayEquals(key.ParamTypes, this.ParamTypes))
         return true;
 
       return false;

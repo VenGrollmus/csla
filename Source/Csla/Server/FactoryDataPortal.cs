@@ -45,24 +45,24 @@ namespace Csla.Server
       object factory = FactoryLoader.GetFactory(factoryTypeName);
       var eventArgs = new DataPortalEventArgs(context, objectType, null, operation);
 
-      Reflection.MethodCaller.CallMethodIfImplemented(factory, "Invoke", eventArgs);
+      Csla.Reflection.MethodCaller.CallMethodIfImplemented(factory, "Invoke", eventArgs);
       object result;
       try
       {
         Utilities.ThrowIfAsyncMethodOnSyncClient(_applicationContext, isSync, factory, methodName);
 
-        result = await Reflection.MethodCaller.CallMethodTryAsync(factory, methodName).ConfigureAwait(false);
+        result = await Csla.Reflection.MethodCaller.CallMethodTryAsync(factory, methodName).ConfigureAwait(false);
         if (result is Exception error)
           throw error;
 
-        if (result is Core.ITrackStatus busy && busy.IsBusy)
+        if (result is Csla.Core.ITrackStatus busy && busy.IsBusy)
           throw new InvalidOperationException($"{objectType.Name}.IsBusy == true");
 
-        Reflection.MethodCaller.CallMethodIfImplemented(factory, "InvokeComplete", eventArgs);
+        Csla.Reflection.MethodCaller.CallMethodIfImplemented(factory, "InvokeComplete", eventArgs);
       }
       catch (Exception ex)
       {
-        Reflection.MethodCaller.CallMethodIfImplemented(
+        Csla.Reflection.MethodCaller.CallMethodIfImplemented(
           factory, "InvokeError", new DataPortalEventArgs(context, objectType, null, operation, ex));
         throw;
       }
@@ -74,24 +74,24 @@ namespace Csla.Server
       object factory = FactoryLoader.GetFactory(factoryTypeName);
       var eventArgs = new DataPortalEventArgs(context, objectType, e, operation);
 
-      Reflection.MethodCaller.CallMethodIfImplemented(factory, "Invoke", eventArgs);
+      Csla.Reflection.MethodCaller.CallMethodIfImplemented(factory, "Invoke", eventArgs);
       object result;
       try
       {
         Utilities.ThrowIfAsyncMethodOnSyncClient(_applicationContext, isSync, factory, methodName, e);
 
-        result = await Reflection.MethodCaller.CallMethodTryAsync(factory, methodName, e).ConfigureAwait(false);
+        result = await Csla.Reflection.MethodCaller.CallMethodTryAsync(factory, methodName, e).ConfigureAwait(false);
         if (result is Exception error)
           throw error;
 
-        if (result is Core.ITrackStatus busy && busy.IsBusy)
+        if (result is Csla.Core.ITrackStatus busy && busy.IsBusy)
           throw new InvalidOperationException($"{objectType.Name}.IsBusy == true");
 
-        Reflection.MethodCaller.CallMethodIfImplemented(factory, "InvokeComplete", eventArgs);
+        Csla.Reflection.MethodCaller.CallMethodIfImplemented(factory, "InvokeComplete", eventArgs);
       }
       catch (Exception ex)
       {
-        Reflection.MethodCaller.CallMethodIfImplemented(factory, "InvokeError", new DataPortalEventArgs(context, objectType, e, operation, ex));
+        Csla.Reflection.MethodCaller.CallMethodIfImplemented(factory, "InvokeError", new DataPortalEventArgs(context, objectType, e, operation, ex));
         throw;
       }
       return new DataPortalResult(_applicationContext, result);

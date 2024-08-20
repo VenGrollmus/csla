@@ -28,14 +28,13 @@ public static class HttpTestServerFactory {
     var clientServices = new ServiceCollection()
       .AddCsla(
       o => o.DataPortal(
-        portalOptions => portalOptions.AddClientSideDataPortal(
+        portalOptions => portalOptions.ClientSideDataPortal(
           a => a.UseHttpProxy(
             proxy => proxy.DataPortalUrl = $"/api/{controllerName}"
             )
           )
         )
       );
-    clientServices.AddScoped<Csla.Core.IContextManager, Csla.Core.ApplicationContextManagerAsyncLocal>();
     clientServices.AddSingleton(testServer.CreateClient());
     var clientServiceProvider = clientServices.BuildServiceProvider();
 

@@ -6,8 +6,6 @@
 // <summary>Translates assembly names to and from short</summary>
 //-----------------------------------------------------------------------
 
-using System.ComponentModel.DataAnnotations;
-
 namespace Csla.Serialization.Mobile
 {
   /// <summary>
@@ -36,7 +34,7 @@ namespace Csla.Serialization.Mobile
       {
         if (_cslaLibAssembly == null)
         {
-          _cslaLibAssembly = typeof(NullPlaceholder).AssemblyQualifiedName;
+          _cslaLibAssembly = typeof(Csla.Serialization.Mobile.NullPlaceholder).AssemblyQualifiedName;
           _cslaLibAssembly = _cslaLibAssembly.Substring(_cslaLibAssembly.IndexOf(", ") + 2);
         }
         return _cslaLibAssembly;
@@ -54,32 +52,10 @@ namespace Csla.Serialization.Mobile
     /// <param name="type">Original type.</param>
     public static string GetAssemblyQualifiedName(Type type)
     {
-      return GetSerializationName(type, true);
-    }
-
-    /// <summary>
-    /// Gets the assembly qualified type name with any use
-    /// of common assemblies translated to
-    /// a short code.
-    /// </summary>
-    /// <param name="type">Original type.</param>
-    /// <param name="useStrongName">Use strong name as type name</param>
-    public static string GetSerializationName(Type type, bool useStrongName)
-    {
-      if (useStrongName)
-      {
-        var result = type.AssemblyQualifiedName;
-        result = result.Replace(CoreLibAssembly, CORELIB);
-        result = result.Replace(CslaLibAssembly, CSLALIB);
-        return result;
-      }
-      else
-      {
-        var assemblyName = type.Assembly == typeof(object).Assembly ? "/n" :
-            type.Assembly == typeof(NullPlaceholder).Assembly ? "/c" :
-            type.Assembly.GetName().Name;
-        return type.FullName + ", " + assemblyName;
-      }
+      var result = type.AssemblyQualifiedName;
+      result = result.Replace(CoreLibAssembly, CORELIB);
+      result = result.Replace(CslaLibAssembly, CSLALIB);
+      return result;
     }
 
     /// <summary>

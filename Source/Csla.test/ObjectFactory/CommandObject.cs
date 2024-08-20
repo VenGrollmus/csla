@@ -8,7 +8,7 @@
 
 namespace Csla.Test.ObjectFactory
 {
-  [Server.ObjectFactory("Csla.Test.ObjectFactory.CommandObjectFactory, Csla.Tests")]
+  [Csla.Server.ObjectFactory("Csla.Test.ObjectFactory.CommandObjectFactory, Csla.Tests")]
   [Serializable]
   public class CommandObject : CommandBase<CommandObject>
   {

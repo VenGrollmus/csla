@@ -66,7 +66,7 @@ namespace Csla.Test.GraphMerge
       BusinessRules.AddRule(new NoTwo { PrimaryProperty = NameProperty });
     }
 
-    private class NoTwo : BusinessRule
+    private class NoTwo : Csla.Rules.BusinessRule
     {
       protected override void Execute(IRuleContext context)
       {

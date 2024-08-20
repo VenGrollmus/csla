@@ -8,7 +8,8 @@
 
 using System.ComponentModel;
 using Csla.Serialization.Mobile;
-#if ANDROID || IOS
+#if NETFX_CORE || (ANDROID || IOS)
+using System.Collections.Generic;
 using System.Collections.Specialized;
 #endif
 
@@ -21,12 +22,13 @@ namespace Csla.Core
   /// <typeparam name="T">Type of item contained in list.</typeparam>
   [Serializable]
   public class ExtendedBindingList<T> : MobileBindingList<T>,
-    IExtendedBindingList,
+    IExtendedBindingList, 
+    IMobileList,
     INotifyBusy,
     INotifyChildChanged,
     ISerializationNotification
   {
-    [NonSerialized]
+    [NonSerialized()]
     private EventHandler<RemovingItemEventArgs> _nonSerializableHandlers;
     private EventHandler<RemovingItemEventArgs> _serializableHandlers;
 
@@ -39,19 +41,19 @@ namespace Csla.Core
       {
         if (value.Method.IsPublic)
           _serializableHandlers = (EventHandler<RemovingItemEventArgs>)
-            Delegate.Combine(_serializableHandlers, value);
+            System.Delegate.Combine(_serializableHandlers, value);
         else
           _nonSerializableHandlers = (EventHandler<RemovingItemEventArgs>)
-            Delegate.Combine(_nonSerializableHandlers, value);
+            System.Delegate.Combine(_nonSerializableHandlers, value);
       }
       remove
       {
         if (value.Method.IsPublic)
           _serializableHandlers = (EventHandler<RemovingItemEventArgs>)
-            Delegate.Remove(_serializableHandlers, value);
+            System.Delegate.Remove(_serializableHandlers, value);
         else
           _nonSerializableHandlers = (EventHandler<RemovingItemEventArgs>)
-            Delegate.Remove(_nonSerializableHandlers, value);
+            System.Delegate.Remove(_nonSerializableHandlers, value);
       }
     }
 
@@ -90,10 +92,10 @@ namespace Csla.Core
     /// Add a range of items to the list.
     /// </summary>
     /// <param name="range">List of items to add.</param>
-    public void AddRange(IEnumerable<T> range)
+    public void AddRange(System.Collections.Generic.IEnumerable<T> range)
     {
       foreach (var element in range)
-        Add(element);
+        this.Add(element);
     }
 
     [NotUndoable]
@@ -155,24 +157,6 @@ namespace Csla.Core
     void busy_BusyChanged(object sender, BusyChangedEventArgs e)
     {
       OnBusyChanged(e);
-    }
-
-    /// <summary>
-    /// Await this method to ensure business object is not busy.
-    /// </summary>
-    /// <param name="timeout">Timeout duration</param>
-    public Task WaitForIdle(TimeSpan timeout)
-    {
-      return BusyHelper.WaitForIdleAsTimeout(() => WaitForIdle(timeout.ToCancellationToken()), GetType(), nameof(WaitForIdle), timeout);
-    }
-
-    /// <summary>
-    /// Await this method to ensure the business object is not busy.
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    public virtual Task WaitForIdle(CancellationToken ct)
-    {
-      return BusyHelper.WaitForIdle(this, ct);
     }
 
     [NotUndoable]
@@ -267,31 +251,52 @@ namespace Csla.Core
         child.ChildChanged -= Child_Changed;
     }
 
+    /// <summary>
+    /// This method is called on a newly deserialized object
+    /// after deserialization is complete.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    protected virtual void OnDeserialized()
+    {
+      // do nothing - this is here so a subclass
+      // could override if needed
+    }
+
     void ISerializationNotification.Deserialized()
     {
       // don't rehook events here, because the MobileFormatter has
       // created new objects and so the lists will auto-subscribe
-      // the events;
+      // the events
+      OnDeserialized();
+    }
+
+    [System.Runtime.Serialization.OnDeserialized]
+    private void OnDeserializedHandler(System.Runtime.Serialization.StreamingContext context)
+    {
+      foreach (T item in this)
+        OnAddEventHooks(item);
+
+      OnDeserialized();
     }
 
     [NonSerialized]
     [NotUndoable]
-    private EventHandler<ChildChangedEventArgs> _childChangedHandlers;
+    private EventHandler<Csla.Core.ChildChangedEventArgs> _childChangedHandlers;
 
     /// <summary>
     /// Event raised when a child object has been changed.
     /// </summary>
-    public event EventHandler<ChildChangedEventArgs> ChildChanged
+    public event EventHandler<Csla.Core.ChildChangedEventArgs> ChildChanged
     {
       add
       {
-        _childChangedHandlers = (EventHandler<ChildChangedEventArgs>)
-          Delegate.Combine(_childChangedHandlers, value);
+        _childChangedHandlers = (EventHandler<Csla.Core.ChildChangedEventArgs>)
+          System.Delegate.Combine(_childChangedHandlers, value);
       }
       remove
       {
-        _childChangedHandlers = (EventHandler<ChildChangedEventArgs>)
-          Delegate.Remove(_childChangedHandlers, value);
+        _childChangedHandlers = (EventHandler<Csla.Core.ChildChangedEventArgs>)
+          System.Delegate.Remove(_childChangedHandlers, value);
       }
     }
 
@@ -308,7 +313,7 @@ namespace Csla.Core
       _childChangedHandlers?.Invoke(this, e);
     }
 
-#if ANDROID || IOS
+#if NETFX_CORE || (ANDROID || IOS)
 
     /// <summary>
     /// Creates a ChildChangedEventArgs and raises the event.
@@ -396,7 +401,7 @@ namespace Csla.Core
 
       public SuppressListChangedEventsClass(BindingList<TC> businessObject)
       {
-        _businessObject = businessObject;
+        this._businessObject = businessObject;
         _initialRaiseListChangedEvents = businessObject.RaiseListChangedEvents;
         businessObject.RaiseListChangedEvents = false;
       }

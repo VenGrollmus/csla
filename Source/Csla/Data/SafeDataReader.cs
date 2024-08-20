@@ -7,8 +7,9 @@
 //-----------------------------------------------------------------------
 
 using System.Data;
-#if !NETSTANDARD2_0 && !NET8_0_OR_GREATER
+#if !NETSTANDARD2_0 && !NET6_0_OR_GREATER
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 #endif
 
 namespace Csla.Data
@@ -19,7 +20,7 @@ namespace Csla.Data
   /// </summary>
   public class SafeDataReader : IDataReader
   {
-#if !NETSTANDARD2_0 && !NET8_0_OR_GREATER
+#if !NETSTANDARD2_0 && !NET6_0_OR_GREATER
     private SqlDataReader _sqlDataReader;
 #endif
 
@@ -38,12 +39,12 @@ namespace Csla.Data
     public SafeDataReader(IDataReader dataReader)
     {
       DataReader = dataReader;
-#if !NETSTANDARD2_0 && !NET8_0_OR_GREATER
+#if !NETSTANDARD2_0 && !NET6_0_OR_GREATER
       _sqlDataReader = DataReader as SqlDataReader;
 #endif
     }
 
-#if !NETSTANDARD2_0 && !NET8_0_OR_GREATER
+#if !NETSTANDARD2_0 && !NET6_0_OR_GREATER
     /// <summary>
     /// Asynchronously gets the data value as a type.
     /// </summary>
@@ -62,7 +63,7 @@ namespace Csla.Data
     /// <typeparam name="T">Type of value</typeparam>
     /// <param name="ordinal">Ordinal position of value</param>
     /// <param name="cancellationToken">Async cancellation token</param>
-    public Task<T> GetFieldValueAsync<T>(int ordinal, CancellationToken cancellationToken)
+    public Task<T> GetFieldValueAsync<T>(int ordinal, System.Threading.CancellationToken cancellationToken)
     {
       if (_sqlDataReader == null)
         throw new NotSupportedException("GetFieldValueAsync");
@@ -87,7 +88,7 @@ namespace Csla.Data
     /// </summary>
     /// <param name="ordinal">Ordinal position of value</param>
     /// <param name="cancellationToken">Async cancellation token</param>
-    public Task<bool> IsDbNullAsync(int ordinal, CancellationToken cancellationToken)
+    public Task<bool> IsDbNullAsync(int ordinal, System.Threading.CancellationToken cancellationToken)
     {
       if (_sqlDataReader == null)
         throw new NotSupportedException("IsDbNullAsync");
@@ -108,7 +109,7 @@ namespace Csla.Data
     /// Advances the reader to the next result.
     /// </summary>
     /// <param name="cancellationToken">Async cancellation token</param>
-    public Task<bool> NextResultAsync(CancellationToken cancellationToken)
+    public Task<bool> NextResultAsync(System.Threading.CancellationToken cancellationToken)
     {
       if (_sqlDataReader == null)
         throw new NotSupportedException("NextResultAsync");
@@ -129,7 +130,7 @@ namespace Csla.Data
     /// Advances to the next record in a recordset.
     /// </summary>
     /// <param name="cancellationToken">Async cancellation token</param>
-    public Task<bool> ReadAsync(CancellationToken cancellationToken)
+    public Task<bool> ReadAsync(System.Threading.CancellationToken cancellationToken)
     {
       if (_sqlDataReader == null)
         throw new NotSupportedException("NextResultAsync");
@@ -248,7 +249,7 @@ namespace Csla.Data
     /// See Chapter 5 for more details on the SmartDate class.
     /// </remarks>
     /// <param name="name">Name of the column containing the value.</param>
-    public SmartDate GetSmartDate(string name)
+    public Csla.SmartDate GetSmartDate(string name)
     {
       return GetSmartDate(DataReader.GetOrdinal(name), true);
     }
@@ -261,7 +262,7 @@ namespace Csla.Data
     /// See Chapter 5 for more details on the SmartDate class.
     /// </remarks>
     /// <param name="i">Ordinal column position of the value.</param>
-    public virtual SmartDate GetSmartDate(int i)
+    public virtual Csla.SmartDate GetSmartDate(int i)
     {
       return GetSmartDate(i, true);
     }
@@ -278,7 +279,7 @@ namespace Csla.Data
     /// <param name="minIsEmpty">
     /// A flag indicating whether the min or max 
     /// value of a data means an empty date.</param>
-    public SmartDate GetSmartDate(string name, bool minIsEmpty)
+    public Csla.SmartDate GetSmartDate(string name, bool minIsEmpty)
     {
       return GetSmartDate(DataReader.GetOrdinal(name), minIsEmpty);
     }
@@ -290,13 +291,13 @@ namespace Csla.Data
     /// <param name="minIsEmpty">
     /// A flag indicating whether the min or max 
     /// value of a data means an empty date.</param>
-    public virtual SmartDate GetSmartDate(
+    public virtual Csla.SmartDate GetSmartDate(
       int i, bool minIsEmpty)
     {
       if (DataReader.IsDBNull(i))
-        return new SmartDate(minIsEmpty);
+        return new Csla.SmartDate(minIsEmpty);
       else
-        return new SmartDate(
+        return new Csla.SmartDate(
           DataReader.GetDateTime(i), minIsEmpty);
     }
 
@@ -307,7 +308,7 @@ namespace Csla.Data
     /// Returns Guid.Empty for null.
     /// </remarks>
     /// <param name="name">Name of the column containing the value.</param>
-    public Guid GetGuid(string name)
+    public System.Guid GetGuid(string name)
     {
       return GetGuid(DataReader.GetOrdinal(name));
     }
@@ -319,7 +320,7 @@ namespace Csla.Data
     /// Returns Guid.Empty for null.
     /// </remarks>
     /// <param name="i">Ordinal column position of the value.</param>
-    public virtual Guid GetGuid(int i)
+    public virtual System.Guid GetGuid(int i)
     {
       if (DataReader.IsDBNull(i))
         return Guid.Empty;
@@ -811,8 +812,8 @@ namespace Csla.Data
     /// <param name="name">Name of the column containing the value.</param>
     public virtual bool IsDBNull(string name)
     {
-      int index = GetOrdinal(name);
-      return IsDBNull(index);
+      int index = this.GetOrdinal(name);
+      return this.IsDBNull(index);
     }
 
     /// <summary>

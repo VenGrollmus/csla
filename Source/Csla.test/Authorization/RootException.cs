@@ -11,7 +11,7 @@
 
     public static void AddObjectAuthorizationRules()
     {
-      Interlocked.Increment(ref _counter);
+      System.Threading.Interlocked.Increment(ref _counter);
       throw new ArgumentException();
     }
   }

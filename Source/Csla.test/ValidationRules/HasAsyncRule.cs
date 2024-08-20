@@ -29,11 +29,11 @@ namespace Csla.Test.ValidationRules
 
     public class Rule1 : BusinessRule
     {
-      public Rule1(Core.IPropertyInfo primaryProperty)
+      public Rule1(Csla.Core.IPropertyInfo primaryProperty)
         : base(primaryProperty)
       {
         IsAsync = true;
-        InputProperties.Add(primaryProperty);
+        InputProperties = [primaryProperty];
       }
 
       protected override void Execute(IRuleContext context)
@@ -49,7 +49,7 @@ namespace Csla.Test.ValidationRules
         {
           var avrc = (RuleContext)e.Argument;
           e.Result = avrc;
-          Thread.Sleep(50);
+          System.Threading.Thread.Sleep(50);
           var name = avrc.InputPropertyValues[NameProperty];
           if (name != null && name.ToString() == "error")
             avrc.AddErrorResult("error detected");
@@ -71,12 +71,12 @@ namespace Csla.Test.ValidationRules
     {
       private Rule1 _innerRule;
 
-      public Rule2(Core.IPropertyInfo primaryProperty)
+      public Rule2(Csla.Core.IPropertyInfo primaryProperty)
         : base(primaryProperty)
       {
         IsAsync = true;
         _innerRule = new Rule1(primaryProperty);
-        InputProperties.AddRange(_innerRule.InputProperties);
+        InputProperties = _innerRule.InputProperties;
       }
 
       protected override void Execute(IRuleContext context)
@@ -92,12 +92,12 @@ namespace Csla.Test.ValidationRules
     {
       private Rule1 _innerRule;
 
-      public Rule3(Core.IPropertyInfo primaryProperty)
+      public Rule3(Csla.Core.IPropertyInfo primaryProperty)
         : base(primaryProperty)
       {
         IsAsync = true;
         _innerRule = new Rule1(primaryProperty);
-        InputProperties.AddRange(_innerRule.InputProperties);
+        InputProperties = _innerRule.InputProperties;
         ProvideTargetWhenAsync = true;
       }
 

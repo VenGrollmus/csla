@@ -5,8 +5,11 @@
 // </copyright>
 // <summary>Model binder for use with CSLA .NET editable business objects.</summary>
 //-----------------------------------------------------------------------
-#if NETSTANDARD2_0 || NET8_0_OR_GREATER 
+#if NETSTANDARD2_0 || NET5_0_OR_GREATER || NETCOREAPP3_1
+using System;
 using System.Collections;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -126,6 +129,9 @@ namespace Csla.Web.Mvc
   }
 }
 #elif !NETSTANDARD
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using System.ComponentModel;
 using System.Collections;
@@ -158,7 +164,7 @@ namespace Csla.Web.Mvc
     /// <returns>Bound object</returns>
     public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
     {
-      if (typeof(IEditableCollection).IsAssignableFrom((bindingContext.ModelType)))
+      if (typeof(Core.IEditableCollection).IsAssignableFrom((bindingContext.ModelType)))
         return BindCslaCollection(controllerContext, bindingContext);
 
       if (bindingContext.Model is ICheckRules suppress)
@@ -178,7 +184,7 @@ namespace Csla.Web.Mvc
       if (bindingContext.Model == null)
         bindingContext.ModelMetadata.Model = CreateModel(controllerContext, bindingContext, bindingContext.ModelType);
 
-      var collection = (IList)bindingContext.Model!;
+      var collection = (IList)bindingContext.Model;
       for (int currIdx = 0; currIdx < collection.Count; currIdx++)
       {
         string subIndexKey = CreateSubIndexName(bindingContext.ModelName, currIdx);
@@ -187,7 +193,7 @@ namespace Csla.Web.Mvc
         var elementModel = collection[currIdx];
         if (elementModel is ICheckRules suppress)
           suppress.SuppressRuleChecking();
-        var elementContext = new ModelBindingContext
+        var elementContext = new ModelBindingContext()
         {
           ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(() => elementModel, elementModel.GetType()),
           ModelName = subIndexKey,
@@ -207,7 +213,7 @@ namespace Csla.Web.Mvc
         }
       }
 
-      return bindingContext.Model!;
+      return bindingContext.Model;
     }
 
     /// <summary>
@@ -235,7 +241,7 @@ namespace Csla.Web.Mvc
     {
       if (bindingContext.Model is BusinessBase obj)
       {
-        if (_checkRulesOnModelUpdated)
+        if (this._checkRulesOnModelUpdated)
         {
           if (obj is ICheckRules suppress)
           {
@@ -274,9 +280,9 @@ namespace Csla.Web.Mvc
     /// <param name="bindingContext">Binding context</param>
     /// <param name="propertyDescriptor">Property descriptor</param>
     /// <param name="value">Value</param>
-    protected override void OnPropertyValidated(ControllerContext controllerContext, ModelBindingContext bindingContext, PropertyDescriptor propertyDescriptor, object value)
+    protected override void OnPropertyValidated(ControllerContext controllerContext, ModelBindingContext bindingContext, System.ComponentModel.PropertyDescriptor propertyDescriptor, object value)
     {
-      if (!(bindingContext.Model is BusinessBase))
+      if (!(bindingContext.Model is Core.BusinessBase))
         base.OnPropertyValidated(controllerContext, bindingContext, propertyDescriptor, value);
     }
   }

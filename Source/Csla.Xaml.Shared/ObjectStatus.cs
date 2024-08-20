@@ -44,11 +44,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool CanCreateObject
     {
-      get { return (bool)GetValue(CanCreateProperty); }
+      get { return (bool)base.GetValue(CanCreateProperty); }
       protected set
       {
         bool old = CanCreateObject;
-        SetValue(CanCreateProperty, value);
+        base.SetValue(CanCreateProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(CanCreateProperty, old, value));
@@ -61,11 +61,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool CanGetObject
     {
-      get { return (bool)GetValue(CanGetProperty); }
+      get { return (bool)base.GetValue(CanGetProperty); }
       protected set
       {
         bool old = CanGetObject;
-        SetValue(CanGetProperty, value);
+        base.SetValue(CanGetProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(CanGetProperty, old, value));
@@ -78,11 +78,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool CanEditObject
     {
-      get { return (bool)GetValue(CanEditProperty); }
+      get { return (bool)base.GetValue(CanEditProperty); }
       protected set
       {
         bool old = CanEditObject;
-        SetValue(CanEditProperty, value);
+        base.SetValue(CanEditProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(CanEditProperty, old, value));
@@ -95,11 +95,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool CanDeleteObject
     {
-      get { return (bool)GetValue(CanDeleteProperty); }
+      get { return (bool)base.GetValue(CanDeleteProperty); }
       protected set
       {
         bool old = CanDeleteObject;
-        SetValue(CanDeleteProperty, value);
+        base.SetValue(CanDeleteProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(CanDeleteProperty, old, value));
@@ -127,11 +127,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool IsDeleted
     {
-      get { return (bool)GetValue(IsDeletedProperty); }
+      get { return (bool)base.GetValue(IsDeletedProperty); }
       protected set 
       {
         bool old = IsDeleted;
-        SetValue(IsDeletedProperty, value);
+        base.SetValue(IsDeletedProperty, value);
         OnPropertyChanged(
           new DependencyPropertyChangedEventArgs(IsDeletedProperty, old, value));
       }
@@ -143,11 +143,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool IsDirty
     {
-      get { return (bool)GetValue(IsDirtyProperty); }
+      get { return (bool)base.GetValue(IsDirtyProperty); }
       protected set
       {
         bool old = IsDirty;
-        SetValue(IsDirtyProperty, value);
+        base.SetValue(IsDirtyProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(IsDirtyProperty, old, value));
@@ -160,11 +160,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool IsNew
     {
-      get { return (bool)GetValue(IsNewProperty); }
+      get { return (bool)base.GetValue(IsNewProperty); }
       protected set
       {
         bool old = IsNew;
-        SetValue(IsNewProperty, value);
+        base.SetValue(IsNewProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(IsNewProperty, old, value));
@@ -177,11 +177,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool IsSavable
     {
-      get { return (bool)GetValue(IsSavableProperty); }
+      get { return (bool)base.GetValue(IsSavableProperty); }
       protected set
       {
         bool old = IsSavable;
-        SetValue(IsSavableProperty, value);
+        base.SetValue(IsSavableProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(IsSavableProperty, old, value));
@@ -194,11 +194,11 @@ namespace Csla.Xaml
     /// </summary>
     public bool IsValid
     {
-      get { return (bool)GetValue(IsValidProperty); }
+      get { return (bool)base.GetValue(IsValidProperty); }
       protected set
       {
         bool old = IsValid;
-        SetValue(IsValidProperty, value);
+        base.SetValue(IsValidProperty, value);
         if (old != value)
           OnPropertyChanged(
             new DependencyPropertyChangedEventArgs(IsValidProperty, old, value));
@@ -261,16 +261,16 @@ namespace Csla.Xaml
       // per-type rules
       if (DataObject != null)
       {
-        var newValue = Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.CreateObject, DataObject);
+        var newValue = Csla.Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.CreateObject, DataObject);
         if (CanCreateObject != newValue)
           CanCreateObject = newValue;
-        newValue = Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.GetObject, DataObject);
+        newValue = Csla.Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.GetObject, DataObject);
         if (CanGetObject != newValue)
           CanGetObject = newValue;
-        newValue = Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.EditObject, DataObject);
+        newValue = Csla.Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.EditObject, DataObject);
         if (CanEditObject != newValue)
           CanEditObject = newValue;
-        newValue = Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.DeleteObject, DataObject);
+        newValue = Csla.Rules.BusinessRules.HasPermission(ApplicationContextManager.GetApplicationContext(), Rules.AuthorizationActions.DeleteObject, DataObject);
         if (CanDeleteObject != newValue)
           CanDeleteObject = newValue;
       }

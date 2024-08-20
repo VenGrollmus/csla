@@ -103,7 +103,7 @@ namespace Csla.Blazor
       if (CurrentEditContext == null)
       {
         throw new InvalidOperationException(
-          string.Format(Properties.Resources.CascadingEditContextRequiredException,
+          string.Format(Csla.Properties.Resources.CascadingEditContextRequiredException,
             nameof(CslaValidationMessages<string>), nameof(EditContext)));
 
       }

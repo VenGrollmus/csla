@@ -13,20 +13,18 @@ using System.Linq.Expressions;
 namespace Csla
 {
   /// <summary>
-  /// Synchronized view over a source list,
+  /// Synchronized view over a source list, 
   /// filtered, sorted and ordered based
   /// on a query result.
   /// </summary>
   /// <typeparam name="T">Type of objects contained in the list/collection.</typeparam>
-  public class LinqObservableCollection<T> :
-    IList<T>,
-    IList,
-    INotifyCollectionChanged
+  public class LinqObservableCollection<T> : IList<T>, ICollection<T>, IEnumerable<T>, 
+    IList, ICollection, INotifyCollectionChanged
   {
     /// <summary>
     /// Event raised when the underlying source list is changed.
     /// </summary>
-    public event NotifyCollectionChangedEventHandler CollectionChanged;
+    public event System.Collections.Specialized.NotifyCollectionChangedEventHandler CollectionChanged;
 
     private System.Collections.ObjectModel.ObservableCollection<T> _baseCollection;
     private bool _suppressEvents = false;

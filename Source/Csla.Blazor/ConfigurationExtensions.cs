@@ -40,9 +40,9 @@ namespace Csla.Configuration
       var blazorOptions = new BlazorServerConfigurationOptions();
       options?.Invoke(blazorOptions);
 
+      // minimize PropertyChanged events
       config.BindingOptions.PropertyChangedMode = ApplicationContext.PropertyChangedModes.Windows;
 
-      // set context manager
       string managerTypeName;
       if (blazorOptions.UseInMemoryApplicationContextManager)
         managerTypeName = "Csla.AspNetCore.Blazor.ApplicationContextManagerInMemory,Csla.AspNetCore";
@@ -51,6 +51,10 @@ namespace Csla.Configuration
       var managerType = Type.GetType(managerTypeName);
       if (managerType is null)
         throw new TypeLoadException(managerTypeName);
+      var contextManagerType = typeof(Core.IContextManager);
+      var managers = config.Services.Where(i => i.ServiceType.Equals(contextManagerType)).ToList();
+      foreach ( var manager in managers )
+        config.Services.Remove(manager);
       config.Services.AddScoped(typeof(IContextManager), managerType);
 
       if (blazorOptions.UseInMemoryApplicationContextManager)
@@ -63,7 +67,7 @@ namespace Csla.Configuration
         // use Blazor state management
         config.Services.AddTransient(typeof(ISessionIdManager), blazorOptions.SessionIdManagerType);
         config.Services.AddSingleton(typeof(ISessionManager), blazorOptions.SessionManagerType);
-        config.Services.AddTransient<StateManager>();
+        config.Services.AddTransient<Blazor.State.StateManager>();
       }
 
       // use Blazor viewmodel

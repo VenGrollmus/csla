@@ -19,13 +19,7 @@ namespace Csla.Server
     /// <param name="clientRequest">
     /// Client request information.
     /// </param>
-    /// <param name="ct">
-    /// The cancellation token.
-    /// </param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public Task AuthorizeAsync(AuthorizeRequest clientRequest, CancellationToken ct)
-    {
-      return Task.CompletedTask;
-    }
+    public void Authorize(AuthorizeRequest clientRequest)
+    { /* allow all requests */ }
   }
 }

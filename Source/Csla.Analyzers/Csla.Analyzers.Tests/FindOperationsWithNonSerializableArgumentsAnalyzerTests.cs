@@ -16,9 +16,9 @@ namespace Csla.Analyzers.Tests
       var diagnostic = diagnostics[0];
       Assert.AreEqual(Constants.AnalyzerIdentifiers.FindOperationsWithNonSerializableArguments, diagnostic.Id,
         nameof(DiagnosticDescriptor.Id));
-      Assert.AreEqual("Find Operation Arguments That Are Not Serializable", diagnostic.Title.ToString(),
+      Assert.AreEqual(FindOperationsWithNonSerializableArgumentsConstants.Title, diagnostic.Title.ToString(),
         nameof(DiagnosticDescriptor.Title));
-      Assert.AreEqual("Operation argument types should be serializable", diagnostic.MessageFormat.ToString(),
+      Assert.AreEqual(FindOperationsWithNonSerializableArgumentsConstants.Message, diagnostic.MessageFormat.ToString(),
         nameof(DiagnosticDescriptor.MessageFormat));
       Assert.AreEqual(Constants.Categories.Design, diagnostic.Category,
         nameof(DiagnosticDescriptor.Category));
@@ -134,6 +134,27 @@ namespace Csla.Analyzers.Tests
           [Fetch]
           private void Fetch([Inject] A x) { }
         }
+        """;
+      await TestHelpers.RunAnalysisAsync<FindOperationsWithNonSerializableArgumentsAnalyzer>(code, []);
+    }
+
+    [TestMethod]
+    public async Task AnalyzeWithMobileObjectAndMethodIsRootOperationWithSerializableArgumentCustomType()
+    {
+      var code =
+        """
+        using Csla;
+        using System;
+
+        [Serializable]
+        public class A { }
+
+        public class B : BusinessBase<B>
+        {
+          [Fetch]
+          private void Fetch(A x) { }
+        }
+
         """;
       await TestHelpers.RunAnalysisAsync<FindOperationsWithNonSerializableArgumentsAnalyzer>(code, []);
     }

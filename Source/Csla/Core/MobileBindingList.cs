@@ -141,7 +141,7 @@ namespace Csla.Core
       info.AddValue("Csla.Core.MobileList.AllowNew", AllowNew);
       info.AddValue("Csla.Core.MobileList.AllowRemove", AllowRemove);
       info.AddValue("Csla.Core.MobileList.RaiseListChangedEvents", RaiseListChangedEvents);
-#if (ANDROID || IOS)
+#if (ANDROID || IOS) || NETFX_CORE
       info.AddValue("Csla.Core.MobileList._supportsChangeNotificationCore", SupportsChangeNotificationCore);
 #endif
     }
@@ -159,7 +159,7 @@ namespace Csla.Core
         throw new InvalidOperationException(Resources.CannotSerializeCollectionsNotOfIMobileObject);
 
       List<int> references = new List<int>();
-      for (int x = 0; x < Count; x++)
+      for (int x = 0; x < this.Count; x++)
       {
         T child = this[x];
         if (child != null)
@@ -208,11 +208,11 @@ namespace Csla.Core
       if (!typeof(IMobileObject).IsAssignableFrom(typeof(T)))
         throw new InvalidOperationException(Resources.CannotSerializeCollectionsNotOfIMobileObject);
 
-      bool originalRaiseListChangedEvents = RaiseListChangedEvents;
+      bool originalRaiseListChangedEvents = this.RaiseListChangedEvents;
 
       try
       {
-        RaiseListChangedEvents = false;
+        this.RaiseListChangedEvents = false;
 
         if (info.Values.TryGetValue("$list", out var value))
         {
@@ -223,19 +223,19 @@ namespace Csla.Core
             if (child is IBusinessBase bb)
             {
               var editLevelAdded = bb.EditLevelAdded;
-              Add(child);
+              this.Add(child);
               bb.EditLevelAdded = editLevelAdded;
             }
             else
             {
-              Add(child);
+              this.Add(child);
             }
           }
         }
       }
       finally
       {
-          RaiseListChangedEvents = originalRaiseListChangedEvents;
+          this.RaiseListChangedEvents = originalRaiseListChangedEvents;
       }
     }
 

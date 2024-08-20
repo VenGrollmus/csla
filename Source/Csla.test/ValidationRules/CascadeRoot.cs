@@ -205,7 +205,7 @@ namespace Csla.Test.ValidationRules
 
     protected override string GetMessage()
     {
-      return HasMessageDelegate ? MessageText : "The sum of {0} and {1} must be equal to {2}.";
+      return HasMessageDelegate ? base.MessageText : "The sum of {0} and {1} must be equal to {2}.";
     }
 
     protected override void Execute(IRuleContext context)
@@ -215,13 +215,13 @@ namespace Csla.Test.ValidationRules
       if (value1 + value2 != _sumValue)
       {
         var message = string.Format(GetMessage(), PrimaryProperty.FriendlyName, _value2Property.FriendlyName, _sumValue);
-        context.Results.Add(new RuleResult(RuleName, PrimaryProperty, message, 1) { Severity = Severity });
+        context.Results.Add(new RuleResult(RuleName, PrimaryProperty, message) { Severity = Severity });
       }
     }
   }
 
 
-  internal class Increment : BusinessRule
+  internal class Increment : Csla.Rules.BusinessRule
   {
     private readonly PropertyInfo<int> _primaryProperty;
     private readonly PropertyInfo<int> _affectedProperty;
@@ -230,6 +230,7 @@ namespace Csla.Test.ValidationRules
     {
       _primaryProperty = primaryProperty;
       _affectedProperty = affectedProperty;
+      if (InputProperties == null) InputProperties = new List<IPropertyInfo>();
       InputProperties.Add(primaryProperty);
       AffectedProperties.Add(affectedProperty);
     }
@@ -292,6 +293,7 @@ namespace Csla.Test.ValidationRules
     public CalcSumRule(IPropertyInfo primaryProperty, params IPropertyInfo[] inputProperties)
       : base(primaryProperty)
     {
+      InputProperties = new List<IPropertyInfo>();
       InputProperties.AddRange(inputProperties);
     }
 
@@ -310,7 +312,7 @@ namespace Csla.Test.ValidationRules
     }
   }
 
-  internal class IncrementNotAffected : CommonBusinessRule
+  internal class IncrementNotAffected : Csla.Rules.CommonRules.CommonBusinessRule
   {
     private readonly PropertyInfo<int> _primaryProperty;
     private readonly PropertyInfo<int> _affectedProperty;
@@ -320,10 +322,11 @@ namespace Csla.Test.ValidationRules
     {
       _primaryProperty = primaryProperty;
       _affectedProperty = affectedProperty;
+      if (InputProperties == null) InputProperties = new List<IPropertyInfo>();
       InputProperties.Add(primaryProperty);
       AffectedProperties.Add(affectedProperty);
 
-      CanRunAsAffectedProperty = false; 
+      this.CanRunAsAffectedProperty = false; 
     }
 
     protected override void Execute(IRuleContext context)

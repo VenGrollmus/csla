@@ -31,12 +31,13 @@ namespace Csla.Blazor
     /// </summary>
     /// <param name="context"></param>
     /// <param name="requirement"></param>
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CslaPermissionRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CslaPermissionRequirement requirement)
     {
-      if (await Rules.BusinessRules.HasPermissionAsync(_applicationContext, requirement.Action, requirement.ObjectType, CancellationToken.None))
+      if (Rules.BusinessRules.HasPermission(_applicationContext, requirement.Action, requirement.ObjectType))
         context.Succeed(requirement);
       else
         context.Fail();
+      return Task.CompletedTask;
     }
   }
 }

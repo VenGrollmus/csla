@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Csla.Test.PropertyInfo
 {
-  [Serializable]
+  [Serializable()]
   public class PropertyInfoRoot : BusinessBase<PropertyInfoRoot>
   {
     #region Factory Methods
@@ -37,31 +37,31 @@ namespace Csla.Test.PropertyInfo
     /// </summary>
     #region Properties
 
-    public static readonly PropertyInfo<String> _nameProperty = RegisterProperty<String>(p => p.Name);
-    public String Name
+    public static readonly PropertyInfo<System.String> _nameProperty = RegisterProperty<System.String>(p => p.Name);
+    public System.String Name
     {
       get { return GetProperty(_nameProperty); }
       set { SetProperty(_nameProperty, value); }
     }
 
-    public static readonly PropertyInfo<String> _nameDataAnnotationsProperty = RegisterProperty<String>(p => p.NameDataAnnotations);
+    public static readonly PropertyInfo<System.String> _nameDataAnnotationsProperty = RegisterProperty<System.String>(p => p.NameDataAnnotations);
     [Display(Name = "Name: DataAnnotations")]
-    public String NameDataAnnotations
+    public System.String NameDataAnnotations
     {
       get { return GetProperty(_nameDataAnnotationsProperty); }
       set { SetProperty(_nameDataAnnotationsProperty, value); }
     }
 
-    public static readonly PropertyInfo<String> _nameComponentModelProperty = RegisterProperty<String>(p => p.NameComponentModel);
+    public static readonly PropertyInfo<System.String> _nameComponentModelProperty = RegisterProperty<System.String>(p => p.NameComponentModel);
     [DisplayName("Name: ComponentModel")]
-    public String NameComponentModel
+    public System.String NameComponentModel
     {
       get { return GetProperty(_nameComponentModelProperty); }
       set { SetProperty(_nameComponentModelProperty, value); }
     }
 
-    public static readonly PropertyInfo<String> _nameFriendlyNameProperty = RegisterProperty<String>(p => p.NameFriendlyName, "Name: Friendly Name");
-    public String NameFriendlyName
+    public static readonly PropertyInfo<System.String> _nameFriendlyNameProperty = RegisterProperty<System.String>(p => p.NameFriendlyName, "Name: Friendly Name");
+    public System.String NameFriendlyName
     {
       get { return GetProperty(_nameFriendlyNameProperty); }
       set { SetProperty(_nameFriendlyNameProperty, value); }
@@ -73,7 +73,7 @@ namespace Csla.Test.PropertyInfo
       get { return GetProperty(NameDefaultValueProperty); }
       set { SetProperty(NameDefaultValueProperty, value); }
     }
-
+    
     public static readonly PropertyInfo<string> StringNullDefaultValueProperty = RegisterProperty<string>(c => c.StringNullDefaultValue, string.Empty, null);
     public string StringNullDefaultValue
     {
@@ -81,19 +81,6 @@ namespace Csla.Test.PropertyInfo
       set { SetProperty(StringNullDefaultValueProperty, value); }
     }
 
-    public static readonly PropertyInfo<string> ContainingTypeProperty = RegisterProperty<string>(new PropertyInfo<string>(nameof(ContainingType), null, typeof(PropertyInfoRoot), RelationshipTypes.None));
-    public string ContainingType
-    {
-      get { return GetProperty(ContainingTypeProperty); }
-      set { SetProperty(ContainingTypeProperty, value); }
-    }
-
-    public static readonly PropertyInfo<string> ContainingTypeNullProperty = RegisterProperty<string>(new PropertyInfo<string>(nameof(ContainingTypeNull), null, null, RelationshipTypes.None));
-    public string ContainingTypeNull
-    {
-      get { return GetProperty(ContainingTypeNullProperty); }
-      set { SetProperty(ContainingTypeNullProperty, value); }
-    }
 
     #endregion
   }

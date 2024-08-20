@@ -1,21 +1,9 @@
-﻿using Csla.Analyzers.Properties;
-using Microsoft.CodeAnalysis;
-
-namespace Csla.Analyzers
+﻿namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   public static class OnlyUseCslaPropertyMethodsInGetSetRuleConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Title = new LocalizableResourceString(nameof(Resources.OnlyUseCslaPropertyMethodsInGetSetRule_Title), Resources.ResourceManager, typeof(Resources));
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Message = new LocalizableResourceString(nameof(Resources.OnlyUseCslaPropertyMethodsInGetSetRule_Message), Resources.ResourceManager, typeof(Resources));
+    public const string Title = "Evaluate Properties for Simplicity";
+    public const string IdentifierText = "OnlyUseCslaPropertyMethodsInGetSetRule";
+    public const string Message = "Properties that use managed backing fields should only use Get/Set/Read/Load methods and nothing else";
   }
 }

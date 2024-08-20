@@ -31,11 +31,10 @@ namespace csla.netcore.test.DataPortal
       // Initialise DI, and add Csla using default settings
       var services = new ServiceCollection();
       services.AddCsla();
-      services.AddScoped<Csla.Core.IContextManager, Csla.Core.ApplicationContextManagerAsyncLocal>();
       serviceProvider = services.BuildServiceProvider();
 
       IDashboard dashboard = serviceProvider.GetRequiredService<IDashboard>();
-      Assert.IsInstanceOfType(dashboard, typeof(NullDashboard));
+      Assert.IsInstanceOfType(dashboard, typeof(Csla.Server.Dashboard.NullDashboard));
     }
 
     // This would really be testing the behaviour of the service provider not the dashboard
@@ -171,7 +170,7 @@ namespace csla.netcore.test.DataPortal
     private void DataPortal_Fetch(int id)
     {
       // load values into object
-      Thread.Sleep(10);
+      System.Threading.Thread.Sleep(10);
     }
 
     [Insert]

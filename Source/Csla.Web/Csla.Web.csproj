@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\Directory.Package.props" />
 
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
@@ -11,8 +10,6 @@
     <BaseOutputPath>..\..\Bin</BaseOutputPath>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
-    <Title>CSLA .NET ASP.NET</Title>
-    <PackageTags>CSLA;ASP.NET;Web Forms</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

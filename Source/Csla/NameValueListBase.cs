@@ -7,8 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel;
-using Csla.Core;
 using Csla.Properties;
+using Csla.Core;
 using Csla.Serialization.Mobile;
 
 namespace Csla
@@ -22,17 +22,16 @@ namespace Csla
   /// <typeparam name="V">Type of the values.</typeparam>
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
   [Serializable]
-  public abstract class NameValueListBase<K, V> :
-    ReadOnlyBindingList<NameValueListBase<K, V>.NameValuePair>,
-    ICloneable,
-    Server.IDataPortalTarget,
+  public abstract class NameValueListBase<K, V> : 
+    Core.ReadOnlyBindingList<NameValueListBase<K, V>.NameValuePair>, 
+    ICloneable, Core.IBusinessObject, Server.IDataPortalTarget,
     IUseApplicationContext
   {
     /// <summary>
     /// Gets the current ApplicationContext
     /// </summary>
     protected ApplicationContext ApplicationContext { get; private set; }
-    ApplicationContext IUseApplicationContext.ApplicationContext
+    ApplicationContext Core.IUseApplicationContext.ApplicationContext
     {
       get => ApplicationContext;
       set
@@ -166,7 +165,7 @@ namespace Csla
     /// <summary>
     /// Contains a key and value pair.
     /// </summary>
-    [Serializable]
+    [Serializable()]
     public class NameValuePair : MobileObject
     {
       private V _value;
@@ -254,7 +253,7 @@ namespace Csla
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     protected virtual object GetClone()
     {
-      return ObjectCloner.GetInstance(ApplicationContext).Clone(this);
+      return Core.ObjectCloner.GetInstance(ApplicationContext).Clone(this);
     }
 
     /// <summary>
@@ -268,15 +267,6 @@ namespace Csla
     #endregion
 
     #region Data Access
-
-    /// <summary>
-    /// Await this method to ensure business object is not busy.
-    /// </summary>
-    public async Task WaitForIdle()
-    {
-      var cslaOptions = ApplicationContext.GetRequiredService<Configuration.CslaOptions>();
-      await WaitForIdle(TimeSpan.FromSeconds(cslaOptions.DefaultWaitForIdleTimeoutInSeconds)).ConfigureAwait(false);
-    }
 
     private void DataPortal_Update()
     {
@@ -331,45 +321,44 @@ namespace Csla
 
     #region IDataPortalTarget Members
 
-    void Server.IDataPortalTarget.CheckRules()
+    void Csla.Server.IDataPortalTarget.CheckRules()
     { }
 
-    Task Server.IDataPortalTarget.CheckRulesAsync() => Task.CompletedTask;
+    Task Csla.Server.IDataPortalTarget.CheckRulesAsync() => Task.CompletedTask;
 
-    async Task Csla.Server.IDataPortalTarget.WaitForIdle(TimeSpan timeout) => await WaitForIdle(timeout).ConfigureAwait(false);
-    async Task Csla.Server.IDataPortalTarget.WaitForIdle(CancellationToken ct) => await WaitForIdle(ct).ConfigureAwait(false);
+    async Task Csla.Server.IDataPortalTarget.WaitForIdle(TimeSpan timeout) => await BusyHelper.WaitForIdle(this, timeout).ConfigureAwait(false);
 
-    void Server.IDataPortalTarget.MarkAsChild()
+    void Csla.Server.IDataPortalTarget.MarkAsChild()
     { }
 
-    void Server.IDataPortalTarget.MarkNew()
+    void Csla.Server.IDataPortalTarget.MarkNew()
     { }
 
-    void Server.IDataPortalTarget.MarkOld()
+    void Csla.Server.IDataPortalTarget.MarkOld()
     { }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalInvoke(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalInvoke(DataPortalEventArgs e)
     {
-      DataPortal_OnDataPortalInvoke(e);
+      this.DataPortal_OnDataPortalInvoke(e);
     }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalInvokeComplete(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalInvokeComplete(DataPortalEventArgs e)
     {
-      DataPortal_OnDataPortalInvokeComplete(e);
+      this.DataPortal_OnDataPortalInvokeComplete(e);
     }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalException(DataPortalEventArgs e, Exception ex)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalException(DataPortalEventArgs e, Exception ex)
     {
-      DataPortal_OnDataPortalException(e, ex);
+      this.DataPortal_OnDataPortalException(e, ex);
     }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalInvoke(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalInvoke(DataPortalEventArgs e)
     { }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalInvokeComplete(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalInvokeComplete(DataPortalEventArgs e)
     { }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalException(DataPortalEventArgs e, Exception ex)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalException(DataPortalEventArgs e, Exception ex)
     { }
 
     #endregion

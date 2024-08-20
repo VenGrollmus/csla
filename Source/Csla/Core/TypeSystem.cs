@@ -1,4 +1,5 @@
-﻿//-----------------------------------------------------------------------
+﻿#if !NETFX_CORE
+//-----------------------------------------------------------------------
 // <copyright file="TypeSystem.cs" company="Marimer LLC">
 //     Copyright (c) Marimer LLC. All rights reserved.
 //     Website: https://cslanet.com
@@ -55,3 +56,4 @@ namespace Csla.Core
     }
   }
 }
+#endif

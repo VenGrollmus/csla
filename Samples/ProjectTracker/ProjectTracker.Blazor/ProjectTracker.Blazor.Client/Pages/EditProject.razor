@@ -20,10 +20,7 @@
 @if (!IsInteractive)
 {
     <h1>Edit Project</h1>
-    <p class="animated-box"></p>
-    <p class="animated-box"></p>
-    <p class="animated-box"></p>
-    <p class="animated-box"></p>
+    <p>Loading app...</p>
 }
 else if (vm.Model == null)
 {
@@ -176,13 +173,13 @@ else
         // Every page _must_ initialize the state manager
         await StateManager.InitializeAsync();
 
-        var renderMode = renderModeProvider.GetRenderMode(this);
-        IsInteractive = renderMode == RenderModes.WasmInteractive || renderMode == RenderModes.ServerInteractive;
-        if (IsInteractive)
-        {
-            vm.Saved += () => NavigationManager.NavigateTo("projects");
-            vm.ModelPropertyChanged += async (s, e) => await InvokeAsync(() => StateHasChanged());
+        vm.Saved += () => NavigationManager.NavigateTo("projects");
+        vm.ModelPropertyChanged += async (s, e) => await InvokeAsync(() => StateHasChanged());
 
+        var renderMode = renderModeProvider.GetRenderMode(this);
+        if (renderMode == RenderModes.WasmInteractive || renderMode == RenderModes.ServerInteractive)
+        {
+            IsInteractive = true;
             if (Id.HasValue)
                 await vm.RefreshAsync(() => projectEditPortal.FetchAsync(Id));
             else

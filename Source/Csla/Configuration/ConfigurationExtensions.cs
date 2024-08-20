@@ -1,3 +1,4 @@
+﻿#if NET462_OR_GREATER || NETSTANDARD2_0 || NET6_0_OR_GREATER
 //-----------------------------------------------------------------------
 // <copyright file="ConfigurationExtensions.cs" company="Marimer LLC">
 //     Copyright (c) Marimer LLC. All rights reserved.
@@ -5,6 +6,7 @@
 // </copyright>
 // <summary>Implement extension methods for base .NET configuration</summary>
 //-----------------------------------------------------------------------
+using Csla.Core;
 using Csla.DataPortalClient;
 using Csla.Runtime;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,19 +35,20 @@ namespace Csla.Configuration
     /// <param name="options">Options for configuring CSLA .NET</param>
     public static IServiceCollection AddCsla(this IServiceCollection services, Action<CslaOptions> options)
     {
-      // ApplicationContext defaults
-      services.AddScoped<Core.IContextManagerLocal, Core.ApplicationContextManagerAsyncLocal>();
-      services.AddScoped<Core.ApplicationContextAccessor>();
-      services.AddScoped<ApplicationContext>();
-
       // Custom configuration
       var cslaOptions = new CslaOptions(services);
       options?.Invoke(cslaOptions);
 
-      // capture options objects
+      // capture options object
       services.AddScoped(_ => cslaOptions);
       services.AddScoped(_ => cslaOptions.DataPortalOptions);
       services.AddScoped(_ => cslaOptions.SecurityOptions);
+
+      // ApplicationContext defaults
+      services.AddScoped<ApplicationContext>();
+      RegisterContextManager(services, cslaOptions.ContextManagerType);
+      if (cslaOptions.ContextManagerType != null)
+        services.AddScoped(typeof(Csla.Core.IContextManager), cslaOptions.ContextManagerType);
 
       // Runtime Info defaults
       services.TryAddScoped(typeof(IRuntimeInfo), typeof(RuntimeInfo));
@@ -54,49 +57,50 @@ namespace Csla.Configuration
       cslaOptions.AddRequiredDataPortalServices(services);
 
       // Default to using LocalProxy and local data portal
-      var proxyInit = services.Count(i => i.ServiceType.Equals(typeof(IDataPortalProxy))) > 0;
+      var proxyInit = services.Any(i => i.ServiceType.Equals(typeof(IDataPortalProxy)));
       if (!proxyInit)
       {
-        cslaOptions.DataPortal(options => options.DataPortalClientOptions.UseLocalProxy());
+        cslaOptions.DataPortal((options) => options.DataPortalClientOptions.UseLocalProxy());
       }
-
-      // Default to using MobileFormatter
-      if (!services.Any(_ => _.ServiceType == typeof(Serialization.ISerializationFormatter)))
-        cslaOptions.Serialization(o => o.UseMobileFormatter());
 
       return services;
     }
 
-    /// <summary>
-    /// Add CSLA .NET services for use by console applications.
-    /// </summary>
-    /// <param name="options"></param>
-    /// <returns></returns>
-    public static CslaOptions AddConsoleApp(this CslaOptions options)
+    private static void RegisterContextManager(IServiceCollection services, Type contextManagerType)
     {
-      return AddConsoleApp(options, null);
+      services.AddScoped<Core.ApplicationContextAccessor>();
+      services.TryAddScoped(typeof(Core.IContextManagerLocal), typeof(Core.ApplicationContextManagerAsyncLocal));
+
+      var managerInit = services.Count(static i => i.ServiceType.Equals(typeof(IContextManager))) > 0;
+      if (managerInit) return;
+
+      if (contextManagerType != null)
+      {
+        services.AddScoped(typeof(Core.IContextManager), contextManagerType);
+      }
+      else
+      {
+        if (LoadContextManager(services, "Csla.Blazor.WebAssembly.ApplicationContextManager, Csla.Blazor.WebAssembly")) return;
+        if (LoadContextManager(services, "Csla.Xaml.ApplicationContextManager, Csla.Xaml")) return;
+        if (LoadContextManager(services, "Csla.Web.Mvc.ApplicationContextManager, Csla.Web.Mvc")) return;
+        if (LoadContextManager(services, "Csla.Web.ApplicationContextManager, Csla.Web")) return;
+        if (LoadContextManager(services, "Csla.Windows.Forms.ApplicationContextManager, Csla.Windows.Forms")) return;
+
+        // default to AsyncLocal context manager
+        services.AddScoped(typeof(Core.IContextManager), typeof(Core.ApplicationContextManager));
+      }
     }
 
-    /// <summary>
-    /// Add CSLA .NET services for use by console applications.
-    /// </summary>
-    /// <param name="options"></param>
-    /// <param name="config"></param>
-    /// <returns></returns>
-    public static CslaOptions AddConsoleApp(this CslaOptions options, Action<ConsoleOptions> config)
+    private static bool LoadContextManager(IServiceCollection services, string managerTypeName)
     {
-      var consoleOptions = new ConsoleOptions();
-      config?.Invoke(consoleOptions);
-
-      var services = options.Services;
-      services.AddScoped(_ => consoleOptions);
-      services.AddScoped<Core.IContextManager, Core.ApplicationContextManagerAsyncLocal>();
-      return options;
+      var managerType = Type.GetType(managerTypeName, false);
+      if (managerType != null)
+      {
+        services.AddScoped(typeof(Core.IContextManager), managerType);
+        return true;
+      }
+      return false;
     }
-
-    /// <summary>
-    /// Options for console applications.
-    /// </summary>
-    public class ConsoleOptions;
   }
 }
+#endif

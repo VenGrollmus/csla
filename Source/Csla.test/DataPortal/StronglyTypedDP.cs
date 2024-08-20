@@ -8,7 +8,7 @@
 
 namespace Csla.Test.DataPortal
 {
-  [Serializable]
+  [Serializable()]
   public class StronglyTypedDP : BusinessBase<StronglyTypedDP>
   {
     public static PropertyInfo<int> IdProperty = RegisterProperty<int>(c => c.Id);
@@ -27,7 +27,7 @@ namespace Csla.Test.DataPortal
 
     //criteria class needs to be protected since DataPortal_xyz methods are 
     //protected
-    [Serializable]
+    [Serializable()]
     protected class Criteria
     {
       public string _data;
@@ -41,19 +41,19 @@ namespace Csla.Test.DataPortal
 
       public Criteria(int id)
       {
-        _ID = id;
-        _data = "fetched existing data";
+        this._ID = id;
+        this._data = "fetched existing data";
       }
     }
 
     public static StronglyTypedDP NewStronglyTypedDP(IDataPortal<StronglyTypedDP> dataPortal)
     {
-      return dataPortal.Create(new Criteria());
+      return dataPortal.Create(new StronglyTypedDP.Criteria());
     }
 
     public static StronglyTypedDP GetStronglyTypedDP(int id, IDataPortal<StronglyTypedDP> dataPortal)
     {
-      return dataPortal.Fetch(new Criteria(id));
+      return dataPortal.Fetch(new StronglyTypedDP.Criteria(id));
     }
 
     public static void DeleteStronglyTypedDP(int id, IDataPortal<StronglyTypedDP> dataPortal)
@@ -61,7 +61,7 @@ namespace Csla.Test.DataPortal
       dataPortal.Delete(new Criteria(id));
     }
 
-    protected void DataPortal_Create(Criteria criteria)
+    protected void DataPortal_Create(StronglyTypedDP.Criteria criteria)
     {
       using (BypassPropertyChecks)
       {
@@ -71,7 +71,7 @@ namespace Csla.Test.DataPortal
       TestResults.Add("StronglyTypedDP", "Created");
     }
 
-    protected void DataPortal_Fetch(Criteria criteria)
+    protected void DataPortal_Fetch(StronglyTypedDP.Criteria criteria)
     {
       using (BypassPropertyChecks)
       {
@@ -101,7 +101,7 @@ namespace Csla.Test.DataPortal
     }
 
     [Delete]
-    protected void DataPortal_Delete(Criteria criteria)
+    protected void DataPortal_Delete(StronglyTypedDP.Criteria criteria)
     {
       TestResults.Add("StronglyTypedDP_Criteria", criteria._ID.ToString());
     }

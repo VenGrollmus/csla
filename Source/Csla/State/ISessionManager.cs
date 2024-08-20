@@ -18,12 +18,7 @@ namespace Csla.State
     /// Retrieves the current user's session from
     /// the web server to the wasm client.
     /// </summary>
-    Task<Session> RetrieveSession(TimeSpan timeout);
-    /// <summary>
-    /// Retrieves the current user's session from
-    /// the web server to the wasm client.
-    /// </summary>
-    Task<Session> RetrieveSession(CancellationToken ct);
+    Task<Session> RetrieveSession();
     /// <summary>
     /// Gets the current user's session from the cache.
     /// </summary>
@@ -32,12 +27,7 @@ namespace Csla.State
     /// Sends the current user's session from
     /// the wasm client to the web server.
     /// </summary>
-    Task SendSession(TimeSpan timeout);
-    /// <summary>
-    /// Sends the current user's session from
-    /// the wasm client to the web server.
-    /// </summary>
-    Task SendSession(CancellationToken ct);
+    Task SendSession();
     #endregion
 
     #region Server
@@ -49,7 +39,6 @@ namespace Csla.State
     /// <summary>
     /// Updates the current user's session data.
     /// </summary>
-    /// <exception cref="ArgumentNullException"><paramref name="newSession"/> is <see langword="null"/>.</exception>
     void UpdateSession(Session newSession);
     /// <summary>
     /// Remove all expired session data.

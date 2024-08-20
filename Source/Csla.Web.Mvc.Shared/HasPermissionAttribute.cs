@@ -5,7 +5,8 @@
 // </copyright>
 // <summary>Restricts callers to an action method.</summary>
 //-----------------------------------------------------------------------
-#if !NETSTANDARD2_0 && !NET8_0_OR_GREATER
+#if !NETSTANDARD2_0 && !NETCOREAPP3_1 && !NET5_0_OR_GREATER
+using System;
 using System.Web;
 using System.Web.Mvc;
 using Csla.Rules;
@@ -71,12 +72,12 @@ namespace Csla.Web.Mvc
       if (filterContext.HttpContext.Request.IsAjaxRequest())
       {
         filterContext.HttpContext.Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
-        filterContext.Result = new JsonResult
+        filterContext.Result = new JsonResult()
         {
           JsonRequestBehavior = JsonRequestBehavior.AllowGet,
           Data = new
           {
-            ErrorType = GetType().Name,
+            ErrorType = this.GetType().Name,
             Action = filterContext.ActionDescriptor.ActionName,
             Message = _errorMsg
           }

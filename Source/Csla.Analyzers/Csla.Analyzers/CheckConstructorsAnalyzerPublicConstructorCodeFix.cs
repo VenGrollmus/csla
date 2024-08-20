@@ -10,28 +10,16 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   [ExportCodeFixProvider(LanguageNames.CSharp)]
   [Shared]
   public sealed class CheckConstructorsAnalyzerPublicConstructorCodeFix
     : CodeFixProvider
   {
-    /// <summary>
-    /// 
-    /// </summary>
     public override ImmutableArray<string> FixableDiagnosticIds => 
       ImmutableArray.Create(Constants.AnalyzerIdentifiers.PublicNoArgumentConstructorIsMissing);
 
-    /// <summary>
-    /// 
-    /// </summary>
     public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
-    /// <summary>
-    /// 
-    /// </summary>
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
       var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
@@ -101,7 +89,7 @@ namespace Csla.Analyzers
       if (classSymbol != null)
       {
         var constructorSymbol = classSymbol.Constructors
-          .Single(_ => _.Parameters.Count() == 0 && !_.IsStatic &&
+          .Single(_ => _.Parameters.Count() == 0 &&
             !_.DeclaredAccessibility.HasFlag(Accessibility.Public));
 
         var constructor = constructorSymbol.DeclaringSyntaxReferences[0].GetSyntax(context.CancellationToken);

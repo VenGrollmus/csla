@@ -8,7 +8,7 @@
 
 namespace Csla.Test.ObjectFactory
 {
-  public class ObjectFactoryLoader : Server.IObjectFactoryLoader
+  public class ObjectFactoryLoader : Csla.Server.IObjectFactoryLoader
   {
     private int _mode;
     private readonly ApplicationContext _applicationContext;

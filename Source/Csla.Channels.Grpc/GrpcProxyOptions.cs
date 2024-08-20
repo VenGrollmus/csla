@@ -16,6 +16,6 @@ namespace Csla.Channels.Grpc
     /// <summary>
     /// Data portal server endpoint URL
     /// </summary>
-    public string DataPortalUrl { get; set; } = string.Empty;
+    public string DataPortalUrl { get; set; }
   }
 }

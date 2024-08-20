@@ -7,21 +7,14 @@
 //-----------------------------------------------------------------------
 
 using Csla.Server;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Csla.Configuration
 {
   /// <summary>
   /// Server-side data portal options.
   /// </summary>
-  /// <param name="services">Service collection.</param>
-  public class DataPortalServerOptions(IServiceCollection services)
+  public class DataPortalServerOptions
   {
-    /// <summary>
-    /// Gets the service collection.
-    /// </summary>
-    public IServiceCollection Services => services;
-
     /// <summary>
     /// Gets or sets a value containing the type of the
     /// IDashboard to be used by the data portal.
@@ -63,7 +56,7 @@ namespace Csla.Configuration
     /// that should be executed by the server-side data portal.
     /// injection.
     /// </summary>
-    internal List<Type> InterceptorProviders { get; } = [typeof(Server.Interceptors.ServerSide.RevalidatingInterceptor)];
+    internal List<Type> InterceptorProviders { get; } = [typeof(Csla.Server.Interceptors.ServerSide.RevalidatingInterceptor)];
 
     /// <summary>
     /// Adds the type of an IInterceptDataPortal that will

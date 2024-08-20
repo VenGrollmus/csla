@@ -48,24 +48,6 @@ namespace Csla.Blazor.State
     /// <summary>
     /// Not supported
     /// </summary>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
-    /// <exception cref="NotSupportedException"></exception>
-    public Task<Session> RetrieveSession(TimeSpan timeout)
-    { throw new NotSupportedException(); }
-
-    /// <summary>
-    /// Retrieves the session asynchronously.
-    /// </summary>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the retrieved session.</returns>
-    /// <exception cref="NotImplementedException">Thrown when the method is called.</exception>
-    public Task<Session> RetrieveSession(CancellationToken ct)
-    { throw new NotImplementedException(); }
-
-    /// <summary>
-    /// Not supported
-    /// </summary>
     /// <returns></returns>
     /// <exception cref="NotSupportedException"></exception>
     public Task SendSession()
@@ -73,26 +55,8 @@ namespace Csla.Blazor.State
     /// <summary>
     /// Not supported
     /// </summary>
-    /// <param name="timeout"></param>
     /// <returns></returns>
     /// <exception cref="NotSupportedException"></exception>
-    public Task SendSession(TimeSpan timeout)
-    { throw new NotSupportedException(); }
-
-    /// <summary>
-    /// Sends the session asynchronously.
-    /// </summary>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    /// <exception cref="NotImplementedException">Thrown when the method is called.</exception>
-    public Task SendSession(CancellationToken ct)
-    { throw new NotImplementedException(); }
-
-    /// <summary>
-    /// Not supported
-    /// </summary>
-    /// <param name="newSession">The new session.</param>
-    /// <exception cref="NotSupportedException">Thrown when the method is called.</exception>
     public void UpdateSession(Session newSession)
     { throw new NotSupportedException(); }
   }

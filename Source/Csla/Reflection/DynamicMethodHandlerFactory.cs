@@ -8,7 +8,7 @@
 //-----------------------------------------------------------------------
 using System.Linq.Expressions;
 using System.Reflection;
-#if !NETSTANDARD2_0 && !NET8_0_OR_GREATER
+#if !NETFX_CORE
 using System.Reflection.Emit;
 #endif
 using Csla.Properties;
@@ -47,12 +47,16 @@ namespace Csla.Reflection
     public static DynamicCtorDelegate CreateConstructor(ConstructorInfo constructor)
     {
       if (constructor == null)
-        throw new ArgumentNullException(nameof(constructor));
+        throw new ArgumentNullException("constructor");
       if (constructor.GetParameters().Length > 0)
         throw new NotSupportedException(Resources.ConstructorsWithParametersNotSupported);
 
       Expression body = Expression.New(constructor);
+#if NETFX_CORE
+      if (constructor.DeclaringType.IsValueType())
+#else
       if (constructor.DeclaringType.IsValueType)
+#endif
       {
         body = Expression.Convert(body, typeof(object));
       }
@@ -63,7 +67,7 @@ namespace Csla.Reflection
     public static DynamicMethodDelegate CreateMethod(System.Reflection.MethodInfo method)
     {
       if (method == null)
-        throw new ArgumentNullException(nameof(method));
+        throw new ArgumentNullException("method");
 
       ParameterInfo[] pi = method.GetParameters();
       var targetExpression = Expression.Parameter(typeof(object));
@@ -94,7 +98,11 @@ namespace Csla.Reflection
            Expression.Return(target, nullRef),
           Expression.Label(target, nullRef));
       }
+#if NETFX_CORE
+      else if (method.ReturnType.IsValueType())
+#else
       else if (method.ReturnType.IsValueType)
+#endif
       {
         body = Expression.Convert(body, typeof(object));
       }
@@ -110,7 +118,7 @@ namespace Csla.Reflection
     public static DynamicMemberGetDelegate CreatePropertyGetter(PropertyInfo property)
     {
       if (property == null)
-        throw new ArgumentNullException(nameof(property));
+        throw new ArgumentNullException("property");
 
       if (!property.CanRead) return null;
 
@@ -119,7 +127,11 @@ namespace Csla.Reflection
         Expression.Convert(target, property.DeclaringType),
         property);
 
+#if NETFX_CORE
+      if (property.PropertyType.IsValueType())
+#else
       if (property.PropertyType.IsValueType)
+#endif
       {
         body = Expression.Convert(body, typeof(object));
       }
@@ -134,7 +146,7 @@ namespace Csla.Reflection
     public static DynamicMemberSetDelegate CreatePropertySetter(PropertyInfo property)
     {
       if (property == null)
-        throw new ArgumentNullException(nameof(property));
+        throw new ArgumentNullException("property");
 
       if (!property.CanWrite) return null;
 
@@ -158,14 +170,18 @@ namespace Csla.Reflection
     public static DynamicMemberGetDelegate CreateFieldGetter(FieldInfo field)
     {
       if (field == null)
-        throw new ArgumentNullException(nameof(field));
+        throw new ArgumentNullException("field");
 
       var target = Expression.Parameter(typeof(object));
       Expression body = Expression.Field(
         Expression.Convert(target, field.DeclaringType),
         field);
 
+#if NETFX_CORE
+      if (field.FieldType.IsValueType())
+#else
       if (field.FieldType.IsValueType)
+#endif
       {
         body = Expression.Convert(body, typeof(object));
       }
@@ -199,7 +215,7 @@ namespace Csla.Reflection
       return lambda.Compile();
     }
 
-#if !NETSTANDARD2_0 && !NET8_0_OR_GREATER
+#if !NETSTANDARD2_0 && !NET6_0_OR_GREATER
     private static void EmitCastToReference(ILGenerator il, Type type)
     {
       if (type.IsValueType)

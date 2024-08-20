@@ -84,7 +84,7 @@ namespace cslalighttest.CslaDataProvider
     }
 
 
-    [Serializable]
+    [Serializable()]
     public class FetchCriteria : CriteriaBase<FetchCriteria>
     {
       public FetchCriteria() { }
@@ -128,7 +128,7 @@ namespace cslalighttest.CslaDataProvider
     protected void DataPortal_Fetch(int criteria)
     {
       LoadProperty(IdProperty, criteria);
-      LoadProperty(NameProperty, $"CustomerWithError Name for Id: {criteria}");
+      LoadProperty(NameProperty, "CustomerWithError Name for Id: " + criteria.ToString());
 
       if (criteria == CustomerWithErrorIDThrowsException)
         throw new ApplicationException("Test for Silverlight DataSource Error!");
@@ -137,7 +137,7 @@ namespace cslalighttest.CslaDataProvider
     protected void DataPortal_Create(int criteria)
     {
       LoadProperty(IdProperty, criteria);
-      LoadProperty(NameProperty, $"New CustomerWithError for Id: {criteria}");
+      LoadProperty(NameProperty, "New CustomerWithError for Id: " + criteria.ToString());
     }
 
     [DeleteSelf]
@@ -149,7 +149,7 @@ namespace cslalighttest.CslaDataProvider
     [Delete]
     protected void DataPortal_Delete(int criteria)
     {
-      Method = $"Deleted CustomerWithError ID {criteria}";
+      Method = "Deleted CustomerWithError ID " + criteria.ToString();
     }
 
     [Insert]

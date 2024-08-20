@@ -6,7 +6,6 @@
 // <summary>Exposes server-side DataPortal functionality through RabbitMQ</summary>
 //-----------------------------------------------------------------------
 
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 using Csla.Core;
 using Csla.Serialization;
@@ -23,37 +22,65 @@ namespace Csla.Channels.RabbitMq
   /// </summary>
   public class RabbitMqPortal : IDisposable
   {
-    internal RabbitMqPortal(ApplicationContext applicationContext, IDataPortalServer dataPortal, RabbitMqPortalOptions rabbitMqPortalOptions)
+    private IDataPortalServer dataPortalServer;
+    private ApplicationContext _applicationContext;
+
+    /// <summary>
+    /// Creates an instance of the type
+    /// </summary>
+    /// <param name="applicationContext"></param>
+    /// <param name="dataPortal">Data portal server service</param>
+    public RabbitMqPortal(ApplicationContext applicationContext, IDataPortalServer dataPortal)
     {
-      _dataPortalServer = dataPortal ?? throw new ArgumentNullException(nameof(dataPortal));
-      _applicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
-      DataPortalUri = rabbitMqPortalOptions.DataPortalUri;
+      dataPortalServer = dataPortal;
+      _applicationContext = applicationContext;
     }
 
-    private readonly IDataPortalServer _dataPortalServer;
-    private readonly ApplicationContext _applicationContext;
+    /// <summary>
+    /// Gets the URI for the data portal service.
+    /// </summary>
+    public string DataPortalUrl { get; }
 
-    private IConnection? Connection;
-    private IModel? Channel;
-    private string? DataPortalQueueName;
+    private IConnection Connection;
+    private IModel Channel;
+    private string DataPortalQueueName;
+
+    /// <summary>
+    /// Gets or sets the timeout for network
+    /// operations in seconds (default is 30 seconds).
+    /// </summary>
+    public int Timeout { get; set; } = 30;
+
+    /// <summary>
+    /// Creates an instance of the object.
+    /// </summary>
+    /// <param name="dataPortalUrl">URI for the data portal</param>
+    public RabbitMqPortal(string dataPortalUrl)
+    {
+      DataPortalUrl = dataPortalUrl;
+    }
 
     private Uri DataPortalUri { get; set; }
 
-#if NET8_0_OR_GREATER
-    [MemberNotNull(nameof(DataPortalUri), nameof(DataPortalQueueName), nameof(Connection), nameof(Channel))]
-#endif
     private void InitializeRabbitMQ()
     {
-      if (Connection == null || DataPortalUri == null || Channel == null || DataPortalQueueName == null)
+      if (Connection == null)
       {
-        if (DataPortalUri == null)
-          throw new InvalidOperationException($"{nameof(DataPortalUri)} == null");
-        DataPortalQueueName = DataPortalUri.AbsolutePath[1..];
+        Console.WriteLine($"Initializing connection to {DataPortalUrl}");
+        DataPortalUri = new Uri(DataPortalUrl);
+        var url = DataPortalUri;
+        if (url.Scheme != "rabbitmq")
+          throw new UriFormatException("Scheme != rabbitmq://");
+        if (string.IsNullOrWhiteSpace(url.Host))
+          throw new UriFormatException("Host");
+        DataPortalQueueName = url.AbsolutePath.Substring(1);
+        if (string.IsNullOrWhiteSpace(DataPortalQueueName))
+          throw new UriFormatException("DataPortalQueueName");
 
-        var factory = new ConnectionFactory { HostName = DataPortalUri.Host };
-        if (DataPortalUri.Port < 0)
-          factory.Port = DataPortalUri.Port;
-        var userInfo = DataPortalUri.UserInfo.Split(':');
+        var factory = new ConnectionFactory() { HostName = url.Host };
+        if (url.Port < 0)
+          factory.Port = url.Port;
+        var userInfo = url.UserInfo.Split(':');
         if (userInfo.Length > 0 && !string.IsNullOrWhiteSpace(userInfo[0]))
           factory.UserName = userInfo[0];
         if (userInfo.Length > 1)
@@ -69,7 +96,7 @@ namespace Csla.Channels.RabbitMq
     public void StartListening()
     {
       InitializeRabbitMQ();
-      Channel?.QueueDeclare(
+      Channel.QueueDeclare(
         queue: DataPortalQueueName,
         durable: false,
         exclusive: false,
@@ -79,8 +106,10 @@ namespace Csla.Channels.RabbitMq
       var consumer = new EventingBasicConsumer(Channel);
       consumer.Received += (_, ea) =>
       {
+        Console.WriteLine($"Received {ea.BasicProperties.Type} for {ea.BasicProperties.CorrelationId} from {ea.BasicProperties.ReplyTo}");
         InvokePortal(ea, ea.Body.ToArray());
       };
+      Console.WriteLine($"Listening on queue {DataPortalQueueName}");
       Channel.BasicConsume(queue: DataPortalQueueName, autoAck: true, consumer: consumer);
     }
 
@@ -89,7 +118,7 @@ namespace Csla.Channels.RabbitMq
       var result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
       try
       {
-        var request = _applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(requestData);
+        var request = SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(requestData);
         result = await CallPortal(ea.BasicProperties.Type, request);
       }
       catch (Exception ex)
@@ -99,23 +128,28 @@ namespace Csla.Channels.RabbitMq
 
       try
       {
-        var response = _applicationContext.GetRequiredService<ISerializationFormatter>().Serialize(result);
+        var response = SerializationFormatterFactory.GetFormatter(_applicationContext).Serialize(result);
         SendMessage(ea.BasicProperties.ReplyTo, ea.BasicProperties.CorrelationId, response);
       }
       catch (Exception ex)
       {
-        result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
-        result.ErrorData = _applicationContext.CreateInstanceDI<DataPortalErrorInfo>(ex);
-        var response = _applicationContext.GetRequiredService<ISerializationFormatter>().Serialize(result);
-        SendMessage(ea.BasicProperties.ReplyTo, ea.BasicProperties.CorrelationId, response);
+        try
+        {
+          result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
+          result.ErrorData = _applicationContext.CreateInstanceDI<DataPortalErrorInfo>(ex);
+          var response = SerializationFormatterFactory.GetFormatter(_applicationContext).Serialize(result);
+          SendMessage(ea.BasicProperties.ReplyTo, ea.BasicProperties.CorrelationId, response);
+        }
+        catch (Exception ex1)
+        {
+          Console.Error.WriteLine($"## ERROR {ex1.Message}");
+        }
       }
     }
 
     private void SendMessage(string target, string correlationId, byte[] request)
     {
       InitializeRabbitMQ();
-      if (Channel is null)
-        throw new InvalidOperationException($"{nameof(Channel)} == null");
       var props = Channel.CreateBasicProperties();
       props.CorrelationId = correlationId;
       Channel.BasicPublish(
@@ -127,21 +161,36 @@ namespace Csla.Channels.RabbitMq
 
     private async Task<DataPortalResponse> CallPortal(string operation, object request)
     {
-      return operation switch
+      DataPortalResponse result;
+      switch (operation)
       {
-        "create" => await Create((CriteriaRequest)request).ConfigureAwait(false),
-        "fetch" => await Fetch((CriteriaRequest)request).ConfigureAwait(false),
-        "update" => await Update((UpdateRequest)request).ConfigureAwait(false),
-        "delete" => await Delete((CriteriaRequest)request).ConfigureAwait(false),
-        _ => throw new InvalidOperationException(operation),
-      };
+        case "create":
+          result = await Create((CriteriaRequest)request).ConfigureAwait(false);
+          break;
+
+        case "fetch":
+          result = await Fetch((CriteriaRequest)request).ConfigureAwait(false);
+          break;
+
+        case "update":
+          result = await Update((UpdateRequest)request).ConfigureAwait(false);
+          break;
+
+        case "delete":
+          result = await Delete((CriteriaRequest)request).ConfigureAwait(false);
+          break;
+
+        default:
+          throw new InvalidOperationException(operation);
+      }
+      return result;
     }
 
     /// <summary>
     /// Create and initialize an existing business object.
     /// </summary>
     /// <param name="request">The request parameter object.</param>
-    private async Task<DataPortalResponse> Create(CriteriaRequest request)
+    public async Task<DataPortalResponse> Create(CriteriaRequest request)
     {
       var result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
       try
@@ -149,25 +198,25 @@ namespace Csla.Channels.RabbitMq
         request = ConvertRequest(request);
 
         // unpack criteria data into object
-        object? criteria = GetCriteria(_applicationContext, request.CriteriaData);
-        if (criteria is DataPortalClient.PrimitiveCriteria primitiveCriteria)
+        object criteria = GetCriteria(_applicationContext, request.CriteriaData);
+        if (criteria is Csla.DataPortalClient.PrimitiveCriteria primitiveCriteria)
         {
           criteria = primitiveCriteria.Value;
         }
 
-        var objectType = Reflection.MethodCaller.GetType(AssemblyNameTranslator.GetAssemblyQualifiedName(request.TypeName), true);
+        var objectType = Csla.Reflection.MethodCaller.GetType(AssemblyNameTranslator.GetAssemblyQualifiedName(request.TypeName), true);
         var context = new DataPortalContext(
-          _applicationContext, (IPrincipal)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.Principal),
+          _applicationContext, (IPrincipal)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.Principal),
           true,
           request.ClientCulture,
           request.ClientUICulture,
-          (IContextDictionary)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.ClientContext));
+          (ContextDictionary)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.ClientContext));
 
-        var dpr = await _dataPortalServer.Create(objectType, criteria, context, true);
+        var dpr = await dataPortalServer.Create(objectType, criteria, context, true);
 
         if (dpr.Error != null)
           result.ErrorData = _applicationContext.CreateInstanceDI<DataPortalErrorInfo>(dpr.Error);
-        result.ObjectData = _applicationContext.GetRequiredService<ISerializationFormatter>().Serialize(dpr.ReturnObject);
+        result.ObjectData = SerializationFormatterFactory.GetFormatter(_applicationContext).Serialize(dpr.ReturnObject);
       }
       catch (Exception ex)
       {
@@ -185,7 +234,7 @@ namespace Csla.Channels.RabbitMq
     /// Get an existing business object.
     /// </summary>
     /// <param name="request">The request parameter object.</param>
-    private async Task<DataPortalResponse> Fetch(CriteriaRequest request)
+    public async Task<DataPortalResponse> Fetch(CriteriaRequest request)
     {
       var result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
       try
@@ -193,25 +242,25 @@ namespace Csla.Channels.RabbitMq
         request = ConvertRequest(request);
 
         // unpack criteria data into object
-        object? criteria = GetCriteria(_applicationContext, request.CriteriaData);
-        if (criteria is DataPortalClient.PrimitiveCriteria primitiveCriteria)
+        object criteria = GetCriteria(_applicationContext, request.CriteriaData);
+        if (criteria is Csla.DataPortalClient.PrimitiveCriteria primitiveCriteria)
         {
           criteria = primitiveCriteria.Value;
         }
 
-        var objectType = Reflection.MethodCaller.GetType(AssemblyNameTranslator.GetAssemblyQualifiedName(request.TypeName), true);
+        var objectType = Csla.Reflection.MethodCaller.GetType(AssemblyNameTranslator.GetAssemblyQualifiedName(request.TypeName), true);
         var context = new DataPortalContext(
-          _applicationContext, (IPrincipal)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.Principal),
+          _applicationContext, (IPrincipal)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.Principal),
           true,
           request.ClientCulture,
           request.ClientUICulture,
-          (IContextDictionary)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.ClientContext));
+          (ContextDictionary)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.ClientContext));
 
-        var dpr = await _dataPortalServer.Fetch(objectType, criteria, context, true);
+        var dpr = await dataPortalServer.Fetch(objectType, criteria, context, true);
 
         if (dpr.Error != null)
           result.ErrorData = _applicationContext.CreateInstanceDI<DataPortalErrorInfo>(dpr.Error);
-        result.ObjectData = _applicationContext.GetRequiredService<ISerializationFormatter>().Serialize(dpr.ReturnObject);
+        result.ObjectData = SerializationFormatterFactory.GetFormatter(_applicationContext).Serialize(dpr.ReturnObject);
       }
       catch (Exception ex)
       {
@@ -229,28 +278,28 @@ namespace Csla.Channels.RabbitMq
     /// Update a business object.
     /// </summary>
     /// <param name="request">The request parameter object.</param>
-    private async Task<DataPortalResponse> Update(UpdateRequest request)
+    public async Task<DataPortalResponse> Update(UpdateRequest request)
     {
       var result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
       try
       {
         request = ConvertRequest(request);
         // unpack object
-        object? obj = GetCriteria(_applicationContext, request.ObjectData);
+        object obj = GetCriteria(_applicationContext, request.ObjectData);
 
         var context = new DataPortalContext(
-          _applicationContext, (IPrincipal)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.Principal),
+          _applicationContext, (IPrincipal)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.Principal),
           true,
           request.ClientCulture,
           request.ClientUICulture,
-          (IContextDictionary)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.ClientContext));
+          (ContextDictionary)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.ClientContext));
 
-        var dpr = await _dataPortalServer.Update(obj, context, true);
+        var dpr = await dataPortalServer.Update(obj, context, true);
 
         if (dpr.Error != null)
           result.ErrorData = _applicationContext.CreateInstanceDI<DataPortalErrorInfo>(dpr.Error);
 
-        result.ObjectData = _applicationContext.GetRequiredService<ISerializationFormatter>().Serialize(dpr.ReturnObject);
+        result.ObjectData = SerializationFormatterFactory.GetFormatter(_applicationContext).Serialize(dpr.ReturnObject);
       }
       catch (Exception ex)
       {
@@ -268,7 +317,7 @@ namespace Csla.Channels.RabbitMq
     /// Delete a business object.
     /// </summary>
     /// <param name="request">The request parameter object.</param>
-    private async Task<DataPortalResponse> Delete(CriteriaRequest request)
+    public async Task<DataPortalResponse> Delete(CriteriaRequest request)
     {
       var result = _applicationContext.CreateInstanceDI<DataPortalResponse>();
       try
@@ -276,25 +325,25 @@ namespace Csla.Channels.RabbitMq
         request = ConvertRequest(request);
 
         // unpack criteria data into object
-        object? criteria = GetCriteria(_applicationContext, request.CriteriaData);
-        if (criteria is DataPortalClient.PrimitiveCriteria primitiveCriteria)
+        object criteria = GetCriteria(_applicationContext, request.CriteriaData);
+        if (criteria is Csla.DataPortalClient.PrimitiveCriteria primitiveCriteria)
         {
           criteria = primitiveCriteria.Value;
         }
 
-        var objectType = Reflection.MethodCaller.GetType(AssemblyNameTranslator.GetAssemblyQualifiedName(request.TypeName), true);
+        var objectType = Csla.Reflection.MethodCaller.GetType(AssemblyNameTranslator.GetAssemblyQualifiedName(request.TypeName), true);
         var context = new DataPortalContext(
-          _applicationContext, (IPrincipal)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.Principal),
+          _applicationContext, (IPrincipal)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.Principal),
           true,
           request.ClientCulture,
           request.ClientUICulture,
-          (IContextDictionary)_applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(request.ClientContext));
+          (ContextDictionary)SerializationFormatterFactory.GetFormatter(_applicationContext).Deserialize(request.ClientContext));
 
-        var dpr = await _dataPortalServer.Delete(objectType, criteria, context, true);
+        var dpr = await dataPortalServer.Delete(objectType, criteria, context, true);
 
         if (dpr.Error != null)
           result.ErrorData = _applicationContext.CreateInstanceDI<DataPortalErrorInfo>(dpr.Error);
-        result.ObjectData = _applicationContext.GetRequiredService<ISerializationFormatter>().Serialize(dpr.ReturnObject);
+        result.ObjectData = SerializationFormatterFactory.GetFormatter(_applicationContext).Serialize(dpr.ReturnObject);
       }
       catch (Exception ex)
       {
@@ -310,11 +359,11 @@ namespace Csla.Channels.RabbitMq
 
     #region Criteria
 
-    private static object? GetCriteria(ApplicationContext applicationContext, byte[]? criteriaData)
+    private static object GetCriteria(ApplicationContext applicationContext, byte[] criteriaData)
     {
-      object? criteria = null;
+      object criteria = null;
       if (criteriaData != null)
-        criteria = applicationContext.GetRequiredService<ISerializationFormatter>().Deserialize(criteriaData);
+        criteria = SerializationFormatterFactory.GetFormatter(applicationContext).Deserialize(criteriaData);
       return criteria;
     }
 
@@ -359,9 +408,9 @@ namespace Csla.Channels.RabbitMq
     /// </summary>
     public void Dispose()
     {
+      Connection?.Close();
       Channel?.Dispose();
       Connection?.Dispose();
-      GC.SuppressFinalize(this);
     }
   }
 }

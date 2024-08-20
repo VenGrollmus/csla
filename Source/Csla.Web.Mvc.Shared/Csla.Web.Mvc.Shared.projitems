@@ -11,7 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ApplicationContextManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AsyncController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigurationExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controller.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CslaModelBinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CslaModelBinderProvider.cs" />
@@ -24,8 +23,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Server\Hosts\HttpPortalController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModelBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebConfiguration.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Directory.Build.props" />
   </ItemGroup>
 </Project>

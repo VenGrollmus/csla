@@ -27,7 +27,6 @@ namespace Csla.Test.ChildChanged
       IServiceCollection services = new ServiceCollection();
 
       services.AddCsla(o => o.Binding(bo => bo.PropertyChangedMode = ApplicationContext.PropertyChangedModes.Windows));
-      services.AddScoped<Csla.Core.IContextManager, Csla.Core.ApplicationContextManagerAsyncLocal>();
       _testDIContext = TestDIContextFactory.CreateDefaultContext();
     }
 
@@ -84,7 +83,7 @@ namespace Csla.Test.ChildChanged
       bool cc = false;
       bool cpc = false;
       bool ccc = false;
-      Core.ChildChangedEventArgs cca = null;
+      Csla.Core.ChildChangedEventArgs cca = null;
 
       var root = dataPortal.Fetch();
       root.PropertyChanged += (_, _) =>
@@ -120,7 +119,7 @@ namespace Csla.Test.ChildChanged
 
       int lc = 0;
       int cc = 0;
-      Core.ChildChangedEventArgs cca = null;
+      Csla.Core.ChildChangedEventArgs cca = null;
 
       var root = listDataPortal.Fetch(false);
       root.Add(dataPortal.FetchChild(true));
@@ -147,7 +146,7 @@ namespace Csla.Test.ChildChanged
 
       int lc = 0;
       int cc = 0;
-      Core.ChildChangedEventArgs cca = null;
+      Csla.Core.ChildChangedEventArgs cca = null;
 
       var root = listDataPortal.Fetch(false);
       root.Add(dataPortal.FetchChild(true));
@@ -178,7 +177,7 @@ namespace Csla.Test.ChildChanged
       int lc = 0;
       int rcc = 0;
       int cc = 0;
-      Core.ChildChangedEventArgs cca = null;
+      Csla.Core.ChildChangedEventArgs cca = null;
 
       var root = listDataPortal.Fetch();
       root.List.Add(dataPortal.FetchChild(true));
@@ -215,7 +214,7 @@ namespace Csla.Test.ChildChanged
       int lc = 0;
       int rcc = 0;
       int cc = 0;
-      Core.ChildChangedEventArgs cca = null;
+      Csla.Core.ChildChangedEventArgs cca = null;
 
       var list = listDataPortal.Fetch();
       list.List.Add(singleRootPortal.FetchChild(true));
@@ -255,7 +254,7 @@ namespace Csla.Test.ChildChanged
       bool rcc = false;
       bool ccc = false;
       bool cc = false;
-      Core.ChildChangedEventArgs cca = null;
+      Csla.Core.ChildChangedEventArgs cca = null;
 
       var root = listContainerDataPortal.Fetch();
       var child = listDataPortal.FetchChild(true);

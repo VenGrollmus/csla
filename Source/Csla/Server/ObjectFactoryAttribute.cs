@@ -86,12 +86,12 @@ namespace Csla.Server
     /// </remarks>
     public ObjectFactoryAttribute(string factoryType)
     {
-      FactoryTypeName = factoryType;
-      CreateMethodName = "Create";
-      FetchMethodName = "Fetch";
-      UpdateMethodName = "Update";
-      DeleteMethodName = "Delete";
-      ExecuteMethodName = "Execute";
+      this.FactoryTypeName = factoryType;
+      this.CreateMethodName = "Create";
+      this.FetchMethodName = "Fetch";
+      this.UpdateMethodName = "Update";
+      this.DeleteMethodName = "Delete";
+      this.ExecuteMethodName = "Execute";
     }
 
     /// <summary>
@@ -107,12 +107,12 @@ namespace Csla.Server
     /// </param>
     public ObjectFactoryAttribute(string factoryType, string createMethod, string fetchMethod)
     {
-      FactoryTypeName = factoryType;
-      CreateMethodName = createMethod;
-      FetchMethodName = fetchMethod;
-      UpdateMethodName = "Update";
-      DeleteMethodName = "Delete";
-      ExecuteMethodName = "Execute";
+      this.FactoryTypeName = factoryType;
+      this.CreateMethodName = createMethod;
+      this.FetchMethodName = fetchMethod;
+      this.UpdateMethodName = "Update";
+      this.DeleteMethodName = "Delete";
+      this.ExecuteMethodName = "Execute";
     }
 
     /// <summary>
@@ -126,12 +126,12 @@ namespace Csla.Server
     /// </param>
     public ObjectFactoryAttribute(string factoryType, string fetchMethod)
     {
-      FactoryTypeName = factoryType;
-      FetchMethodName = fetchMethod;
-      CreateMethodName = "Create";
-      UpdateMethodName = "Update";
-      DeleteMethodName = "Delete";
-      ExecuteMethodName = "Execute";
+      this.FactoryTypeName = factoryType;
+      this.FetchMethodName = fetchMethod;
+      this.CreateMethodName = "Create";
+      this.UpdateMethodName = "Update";
+      this.DeleteMethodName = "Delete";
+      this.ExecuteMethodName = "Execute";
     }
 
 
@@ -153,12 +153,12 @@ namespace Csla.Server
     public ObjectFactoryAttribute(
       string factoryType, string createMethod, string fetchMethod, string updateMethod, string deleteMethod)
     {
-      FactoryTypeName = factoryType;
-      CreateMethodName = createMethod;
-      FetchMethodName = fetchMethod;
-      UpdateMethodName = updateMethod;
-      DeleteMethodName = deleteMethod;
-      ExecuteMethodName = "Execute";
+      this.FactoryTypeName = factoryType;
+      this.CreateMethodName = createMethod;
+      this.FetchMethodName = fetchMethod;
+      this.UpdateMethodName = updateMethod;
+      this.DeleteMethodName = deleteMethod;
+      this.ExecuteMethodName = "Execute";
     }
 
     /// <summary>
@@ -185,12 +185,12 @@ namespace Csla.Server
     public ObjectFactoryAttribute(
       string factoryType, string createMethod, string fetchMethod, string updateMethod, string deleteMethod, string executeMethod)
     {
-      FactoryTypeName = factoryType;
-      CreateMethodName = createMethod;
-      FetchMethodName = fetchMethod;
-      UpdateMethodName = updateMethod;
-      DeleteMethodName = deleteMethod;
-      ExecuteMethodName = executeMethod;
+      this.FactoryTypeName = factoryType;
+      this.CreateMethodName = createMethod;
+      this.FetchMethodName = fetchMethod;
+      this.UpdateMethodName = updateMethod;
+      this.DeleteMethodName = deleteMethod;
+      this.ExecuteMethodName = executeMethod;
     }
 
     /// <summary>
@@ -285,7 +285,11 @@ namespace Csla.Server
     /// <param name="type">The type.</param>
     private static string GetAssemblyQualifiedName(Type type)
     {
+#if NETFX_CORE
+      if (type.IsGenericType())
+#else
       if (type.IsGenericType)
+#endif
       {
         return type.AssemblyQualifiedName;
       }

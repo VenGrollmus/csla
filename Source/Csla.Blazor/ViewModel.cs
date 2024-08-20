@@ -42,10 +42,6 @@ namespace Csla.Blazor
     /// </summary>
     public event Action Saved;
     /// <summary>
-    /// Event raised when failed to save Model.
-    /// </summary>
-    public event EventHandler<Core.ErrorEventArgs> Error;
-    /// <summary>
     /// Event raised when Model is changing.
     /// </summary>
     public event Action<T, T> ModelChanging;
@@ -228,26 +224,9 @@ namespace Csla.Blazor
     public TimeSpan BusyTimeout { get; set; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
-    /// Saves the Model asynchronously.
-    /// </summary>
-    public async Task SaveAsync()
-    {
-      try
-      {
-        await SaveAsync(BusyTimeout.ToCancellationToken());
-      }
-      catch (TaskCanceledException tcex)
-      {
-        Exception = new TimeoutException(nameof(SaveAsync), tcex);
-        ViewModelErrorText = Exception.Message;
-      }
-    }
-
-    /// <summary>
     /// Saves the Model.
     /// </summary>
-    /// <param name="ct">The cancellation token.</param>
-    public async Task SaveAsync(CancellationToken ct)
+    public async Task SaveAsync()
     {
       Exception = null;
       ViewModelErrorText = null;
@@ -257,10 +236,12 @@ namespace Csla.Blazor
         {
           if (obj.IsBusy)
           {
+            var stopTime = DateTime.Now + BusyTimeout;
             while (obj.IsBusy)
             {
-              ct.ThrowIfCancellationRequested();
-              await Task.Delay(1, ct);
+              if (DateTime.Now > stopTime)
+                throw new TimeoutException("SaveAsync");
+              await Task.Delay(1);
             }
           }
           if (!obj.IsValid)
@@ -270,7 +251,7 @@ namespace Csla.Blazor
           }
           else if (!obj.IsSavable)
             throw new InvalidOperationException(
-                $"{obj.GetType().Name} IsBusy: {obj.IsBusy}, IsValid: {obj.IsValid}, IsSavable: {obj.IsSavable}");
+              $"{obj.GetType().Name} IsBusy: {obj.IsBusy}, IsValid: {obj.IsValid}, IsSavable: {obj.IsSavable}");
         }
 
         UnhookChangedEvents(Model);
@@ -296,11 +277,6 @@ namespace Csla.Blazor
         Exception = ex;
         ViewModelErrorText = ex.BusinessExceptionMessage;
       }
-      catch (TimeoutException ex)
-      {
-        Exception = ex;
-        ViewModelErrorText = ex.Message;
-      }
       catch (Exception ex)
       {
         Exception = ex;
@@ -313,10 +289,6 @@ namespace Csla.Blazor
 
         HookChangedEvents(Model);
         IsBusy = false;
-        if (Exception != null)
-        {
-          Error?.Invoke(this, new Core.ErrorEventArgs(this, Exception));
-        }
       }
     }
 
@@ -329,7 +301,7 @@ namespace Csla.Blazor
       {
         var saved = (T)await cloned.SaveAsync();
         if (Model is Core.IEditableBusinessObject editable)
-          await new Core.GraphMerger(ApplicationContext).MergeGraphAsync(editable, (Core.IEditableBusinessObject)saved);
+          new Core.GraphMerger(ApplicationContext).MergeGraph(editable, (Core.IEditableBusinessObject)saved);
         else
           Model = saved;
       }
@@ -368,7 +340,7 @@ namespace Csla.Blazor
     /// <summary>
     /// Gets or sets the Model object.
     /// </summary>
-    public T Model
+    public T Model 
     {
       get => _model;
       set
@@ -396,7 +368,6 @@ namespace Csla.Blazor
     /// </summary>
     public bool IsBusy { get; protected set; } = false;
 
-    private const string TextSeparator = " ";
     #endregion
 
     #region GetPropertyInfo
@@ -414,24 +385,7 @@ namespace Csla.Blazor
 
       var keyName = property.GetKey();
       var identifier = Microsoft.AspNetCore.Components.Forms.FieldIdentifier.Create(property);
-      return GetPropertyInfo(keyName, identifier.Model, identifier.FieldName, TextSeparator);
-    }
-
-    /// <summary>
-    /// Get a PropertyInfo object for a property.
-    /// PropertyInfo provides access
-    /// to the meta-state of the property.
-    /// </summary>
-    /// <param name="property">Property expression</param>
-    /// <param name="textSeparator">text seprator for concatenating errors </param>
-    public IPropertyInfo GetPropertyInfo<P>(string textSeparator, Expression<Func<P>> property)
-    {
-      if (property == null)
-        throw new ArgumentNullException(nameof(property));
-
-      var keyName = property.GetKey();
-      var identifier = Microsoft.AspNetCore.Components.Forms.FieldIdentifier.Create(property);
-      return GetPropertyInfo(keyName, identifier.Model, identifier.FieldName, textSeparator);
+      return GetPropertyInfo(keyName, identifier.Model, identifier.FieldName);
     }
 
     /// <summary>
@@ -448,7 +402,7 @@ namespace Csla.Blazor
 
       var keyName = property.GetKey() + $"[{id}]";
       var identifier = Microsoft.AspNetCore.Components.Forms.FieldIdentifier.Create(property);
-      return GetPropertyInfo(keyName, identifier.Model, identifier.FieldName, TextSeparator);
+      return GetPropertyInfo(keyName, identifier.Model, identifier.FieldName);
     }
 
     /// <summary>
@@ -460,7 +414,7 @@ namespace Csla.Blazor
     public IPropertyInfo GetPropertyInfo(string propertyName)
     {
       var keyName = Model.GetType().FullName + "." + propertyName;
-      return GetPropertyInfo(keyName, Model, propertyName, " ");
+      return GetPropertyInfo(keyName, Model, propertyName);
     }
 
     /// <summary>
@@ -473,19 +427,19 @@ namespace Csla.Blazor
     public IPropertyInfo GetPropertyInfo(string propertyName, string id)
     {
       var keyName = Model.GetType().FullName + "." + propertyName + $"[{id}]";
-      return GetPropertyInfo(keyName, Model, propertyName, " ");
+      return GetPropertyInfo(keyName, Model, propertyName);
     }
 
     private readonly Dictionary<string, IPropertyInfo> _propertyInfoCache = [];
 
-    private IPropertyInfo GetPropertyInfo(string keyName, object model, string propertyName, string textSeparator)
+    private IPropertyInfo GetPropertyInfo(string keyName, object model, string propertyName)
     {
       if (_propertyInfoCache.TryGetValue(keyName, out var result))
       {
         return result;
       }
 
-      result = new PropertyInfo(model, propertyName,textSeparator);
+      result = new PropertyInfo(model, propertyName);
       _propertyInfoCache.Add(keyName, result);
       return result;
     }
@@ -527,7 +481,7 @@ namespace Csla.Blazor
     #region ObjectLevelPermissions
 
     private bool _canCreateObject;
-
+    
     /// <summary>
     /// Gets a value indicating whether the current user
     /// is authorized to create an instance of the
@@ -537,7 +491,7 @@ namespace Csla.Blazor
     {
       get
       {
-        SetPropertiesAtObjectLevel();
+        SetPropertiesAtObjectLevel(); 
         return _canCreateObject;
       }
       protected set
@@ -590,7 +544,7 @@ namespace Csla.Blazor
     }
 
     private bool _canDeleteObject;
-
+    
     /// <summary>
     /// Gets a value indicating whether the current user
     /// is authorized to delete an instance of the
@@ -623,10 +577,10 @@ namespace Csla.Blazor
 
       Type sourceType = typeof(T);
 
-      CanCreateObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.CreateObject, sourceType);
-      CanGetObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.GetObject, sourceType);
-      CanEditObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.EditObject, sourceType);
-      CanDeleteObject = BusinessRules.HasPermission(ApplicationContext, AuthorizationActions.DeleteObject, sourceType);
+      CanCreateObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.CreateObject, sourceType);
+      CanGetObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.GetObject, sourceType);
+      CanEditObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.EditObject, sourceType);
+      CanDeleteObject = BusinessRules.HasPermission(ApplicationContext, Rules.AuthorizationActions.DeleteObject, sourceType);
     }
 
     #endregion

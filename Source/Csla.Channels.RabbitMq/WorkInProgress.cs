@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Csla.Threading;
 
 namespace Csla.Channels.RabbitMq
 {
@@ -10,12 +9,7 @@ namespace Csla.Channels.RabbitMq
 
   internal class WipItem
   {
-    public Threading.AsyncManualResetEvent ResetEvent { get; }
-    public byte[]? Response { get; set; }
-
-    internal WipItem(AsyncManualResetEvent resetEvent)
-    {
-      ResetEvent = resetEvent;
-    }
+    public Csla.Threading.AsyncManualResetEvent ResetEvent { get; set; }
+    public byte[] Response { get; set; }
   }
 }

@@ -77,20 +77,5 @@ namespace Csla.Analyzers.Extensions
         return new DataPortalOperationQualification(byNamingConvention, byAttribute);
       }
     }
-
-    internal static CslaOperationQualification IsAddObjectAuthorizationRulesOperation(this IMethodSymbol @this)
-    {
-      if (@this is null)
-      {
-        return new CslaOperationQualification();
-      }
-      else
-      {
-        var byNamingConvention =
-          @this.Name == CslaMemberConstants.Operations.AddObjectAuthorizationRules;
-        var byAttribute = @this.GetAttributes().Any(_ => _.AttributeClass.IsObjectAuthorizationRulesAttribute());
-        return new CslaOperationQualification(byNamingConvention, byAttribute);
-      }
-    }
   }
 }

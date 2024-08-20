@@ -15,7 +15,7 @@ namespace Csla.Test.BypassPropertyChecks
     public BypassBusinessBaseUsingFactory Fetch()
     {
       BypassBusinessBaseUsingFactory returnValue = new BypassBusinessBaseUsingFactory();
-      using (BypassPropertyChecks(returnValue))
+      using (this.BypassPropertyChecks(returnValue))
       {
         returnValue.Id2 = 7; // bypass user rights
       }

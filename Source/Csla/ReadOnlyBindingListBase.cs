@@ -5,6 +5,23 @@
 // </copyright>
 // <summary>This is the base class from which readonly collections</summary>
 //-----------------------------------------------------------------------
+#if NETFX_CORE
+using System;
+
+namespace Csla
+{
+  /// <summary>
+  /// This is the base class from which readonly collections
+  /// of readonly objects should be derived.
+  /// </summary>
+  /// <typeparam name="T">Type of the list class.</typeparam>
+  /// <typeparam name="C">Type of child objects contained in the list.</typeparam>
+  [Serializable]
+  public abstract class ReadOnlyBindingListBase<T, C> : ReadOnlyListBase<T, C>
+    where T : ReadOnlyBindingListBase<T, C>
+  { }
+}
+#else
 using System.ComponentModel;
 using Csla.Core;
 using Csla.Properties;
@@ -19,9 +36,9 @@ namespace Csla
   /// <typeparam name="C">Type of child objects contained in the list.</typeparam>
   [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-  [Serializable]
-  public abstract class ReadOnlyBindingListBase<T, C> :
-    Core.ReadOnlyBindingList<C>, Csla.Core.IReadOnlyCollection,
+  [Serializable()]
+  public abstract class ReadOnlyBindingListBase<T, C> : 
+    Core.ReadOnlyBindingList<C>, Csla.Core.IReadOnlyCollection, 
     ICloneable, Server.IDataPortalTarget, Core.IUseApplicationContext
     where T : ReadOnlyBindingListBase<T, C>
   {
@@ -29,8 +46,8 @@ namespace Csla
     /// Gets the current ApplicationContext
     /// </summary>
     protected ApplicationContext ApplicationContext { get; private set; }
-    ApplicationContext Core.IUseApplicationContext.ApplicationContext
-    {
+    ApplicationContext Core.IUseApplicationContext.ApplicationContext 
+    { 
       get => ApplicationContext;
       set
       {
@@ -45,7 +62,7 @@ namespace Csla
     protected ReadOnlyBindingListBase()
     { }
 
-    #region Initialize
+#region Initialize
 
     /// <summary>
     /// Override this method to set up event handlers so user
@@ -55,9 +72,9 @@ namespace Csla
     protected virtual void Initialize()
     { /* allows subclass to initialize events before any other activity occurs */ }
 
-    #endregion
+#endregion
 
-    #region ICloneable
+#region ICloneable
 
     object ICloneable.Clone()
     {
@@ -70,7 +87,7 @@ namespace Csla
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     protected virtual object GetClone()
     {
-      return ObjectCloner.GetInstance(ApplicationContext).Clone(this);
+      return Core.ObjectCloner.GetInstance(ApplicationContext).Clone(this);
     }
 
     /// <summary>
@@ -84,9 +101,9 @@ namespace Csla
       return (T)GetClone();
     }
 
-    #endregion
+#endregion
 
-    #region Data Access
+#region Data Access
 
     private void DataPortal_Update()
     {
@@ -171,9 +188,9 @@ namespace Csla
     {
     }
 
-    #endregion
+#endregion
 
-    #region ToArray
+#region ToArray
 
     /// <summary>
     /// Get an array containing all items in the list.
@@ -185,57 +202,57 @@ namespace Csla
         result.Add(item);
       return result.ToArray();
     }
-    #endregion
+#endregion
 
-    #region IDataPortalTarget Members
+#region IDataPortalTarget Members
 
-    void Server.IDataPortalTarget.CheckRules()
+    void Csla.Server.IDataPortalTarget.CheckRules()
     { }
 
-    Task Server.IDataPortalTarget.CheckRulesAsync() => Task.CompletedTask;
+    Task Csla.Server.IDataPortalTarget.CheckRulesAsync() => Task.CompletedTask;
 
-    Task Csla.Server.IDataPortalTarget.WaitForIdle(TimeSpan timeout) => WaitForIdle(timeout);
-    Task Csla.Server.IDataPortalTarget.WaitForIdle(CancellationToken ct) => WaitForIdle(ct);
+    async Task Csla.Server.IDataPortalTarget.WaitForIdle(TimeSpan timeout) => await BusyHelper.WaitForIdle(this, timeout).ConfigureAwait(false);
 
-    void Server.IDataPortalTarget.MarkAsChild()
+    void Csla.Server.IDataPortalTarget.MarkAsChild()
     { }
 
-    void Server.IDataPortalTarget.MarkNew()
+    void Csla.Server.IDataPortalTarget.MarkNew()
     { }
 
-    void Server.IDataPortalTarget.MarkOld()
+    void Csla.Server.IDataPortalTarget.MarkOld()
     { }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalInvoke(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalInvoke(DataPortalEventArgs e)
     {
-      DataPortal_OnDataPortalInvoke(e);
+      this.DataPortal_OnDataPortalInvoke(e);
     }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalInvokeComplete(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalInvokeComplete(DataPortalEventArgs e)
     {
-      DataPortal_OnDataPortalInvokeComplete(e);
+      this.DataPortal_OnDataPortalInvokeComplete(e);
     }
 
-    void Server.IDataPortalTarget.DataPortal_OnDataPortalException(DataPortalEventArgs e, Exception ex)
+    void Csla.Server.IDataPortalTarget.DataPortal_OnDataPortalException(DataPortalEventArgs e, Exception ex)
     {
-      DataPortal_OnDataPortalException(e, ex);
+      this.DataPortal_OnDataPortalException(e, ex);
     }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalInvoke(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalInvoke(DataPortalEventArgs e)
     {
-      Child_OnDataPortalInvoke(e);
+      this.Child_OnDataPortalInvoke(e);
     }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalInvokeComplete(DataPortalEventArgs e)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalInvokeComplete(DataPortalEventArgs e)
     {
-      Child_OnDataPortalInvokeComplete(e);
+      this.Child_OnDataPortalInvokeComplete(e);
     }
 
-    void Server.IDataPortalTarget.Child_OnDataPortalException(DataPortalEventArgs e, Exception ex)
+    void Csla.Server.IDataPortalTarget.Child_OnDataPortalException(DataPortalEventArgs e, Exception ex)
     {
-      Child_OnDataPortalException(e, ex);
+      this.Child_OnDataPortalException(e, ex);
     }
 
-    #endregion
+#endregion
   }
 }
+#endif

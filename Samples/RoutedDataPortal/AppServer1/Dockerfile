@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
 COPY AppServer1/AppServer1.csproj AppServer1/
 COPY BusinessLibrary/BusinessLibrary.csproj BusinessLibrary/

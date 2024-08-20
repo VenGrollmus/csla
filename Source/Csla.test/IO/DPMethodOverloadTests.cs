@@ -122,7 +122,7 @@ namespace Csla.Test.IO
   }
 
   [Serializable]
-  public class TestBizObj : BusinessBase<TestBizObj>
+  public class TestBizObj : Csla.BusinessBase<TestBizObj>
   {
     protected override object GetIdValue()
     {

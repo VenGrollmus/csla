@@ -24,9 +24,5 @@ namespace Csla.Core
     /// removed from the list.
     /// </summary>
     event EventHandler<RemovingItemEventArgs> RemovingItem;
-    /// <summary>
-    /// Creates and adds a new item to the collection.
-    /// </summary>
-    Task<object> AddNewAsync();
   }
 }

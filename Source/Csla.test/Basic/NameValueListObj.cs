@@ -8,25 +8,24 @@
 
 namespace Csla.Test.Basic
 {
-  [Serializable]
-  public class NameValueListObj : NameValueListBase<int, string>
-  {
-    #region "Data Access"
-
-    protected void DataPortal_Fetch()
+    [Serializable()]
+    public class NameValueListObj : NameValueListBase<int, string>
     {
-      TestResults.Reinitialise();
-      TestResults.Add("NameValueListObj", "Fetched");
+        #region "Data Access"
 
-      IsReadOnly = false;
-      for (int i = 0; i < 10; i++)
-      {
-        Add(new NameValuePair(i, $"element_{i}"));
-      }
+        protected void DataPortal_Fetch()
+        {
+            TestResults.Reinitialise();
+            TestResults.Add("NameValueListObj", "Fetched");
 
-      IsReadOnly = true;
+            this.IsReadOnly = false;
+            for (int i = 0; i < 10; i++)
+            {
+                this.Add(new NameValuePair(i, "element_" + i.ToString()));
+            }
+            this.IsReadOnly = true;
+        }
+
+        #endregion
     }
-
-    #endregion
-  }
 }

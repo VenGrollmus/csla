@@ -1,6 +1,7 @@
 using BlazorExample.Client.Components.Pages;
 using BlazorExample.Components;
 using Csla.Configuration;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,12 @@ builder.Services.AddHttpContextAccessor();
 // Add CSLA
 builder.Services.AddCsla(o => o
   .AddAspNetCore()
-  .AddServerSideBlazor(o => o.UseInMemoryApplicationContextManager = false));
+  .AddServerSideBlazor(o => o.UseInMemoryApplicationContextManager = false)
+  .Security(so => so.FlowSecurityPrincipalFromClient = false)
+  .DataPortal(dpo => dpo
+    .AddServerSideDataPortal()
+    .ClientSideDataPortal(co => co
+      .UseLocalProxy())));
 
 // configure DAL services for EF or Mock:
 
@@ -29,6 +35,18 @@ builder.Services.AddCsla(o => o
 
 // for Mock Db
 builder.Services.AddTransient(typeof(DataAccess.IPersonDal), typeof(DataAccess.Mock.PersonDal));
+
+// Required by CSLA data portal controller. If using Kestrel:
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+  options.AllowSynchronousIO = true;
+});
+
+// Required by CSLA data portal controller. If using IIS:
+builder.Services.Configure<IISServerOptions>(options =>
+{
+  options.AllowSynchronousIO = true;
+});
 
 var app = builder.Build();
 

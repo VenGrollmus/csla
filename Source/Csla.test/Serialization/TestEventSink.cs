@@ -8,26 +8,26 @@
 
 namespace Csla.Test.Serialization
 {
-  [Serializable]
-  public class TestEventSink
-  {
-    public void Reg(Core.BusinessBase obj)
+    [Serializable( )]
+    public class TestEventSink
     {
-      obj.PropertyChanged += PrivateOnIsDirtyChanged;
-      obj.PropertyChanged += OnIsDirtyChanged;
-    }
+        public void Reg(Core.BusinessBase obj)
+        {
+            obj.PropertyChanged += PrivateOnIsDirtyChanged;
+            obj.PropertyChanged += OnIsDirtyChanged;
+        }
 
-    private void PrivateOnIsDirtyChanged(object sender,
-      System.ComponentModel.PropertyChangedEventArgs e)
-    {
-      TestResults.Add("Test.PrivateOnIsDirtyChanged", "Test.PrivateOnIsDirtyChanged");
-      Console.WriteLine("PrivateOnIsDirtyChanged event handler output assigned with reg method");
-    }
+        private void PrivateOnIsDirtyChanged(object sender, 
+            System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            TestResults.Add("Test.PrivateOnIsDirtyChanged", "Test.PrivateOnIsDirtyChanged");
+            Console.WriteLine("PrivateOnIsDirtyChanged event handler output assigned with reg method");
+        }
 
-    public void OnIsDirtyChanged(object sender,
-      System.ComponentModel.PropertyChangedEventArgs e)
-    {
-      TestResults.Add("Test.OnIsDirtyChanged", "Test.OnIsDirtyChanged");
+        public void OnIsDirtyChanged(object sender,
+            System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            TestResults.Add("Test.OnIsDirtyChanged", "Test.OnIsDirtyChanged");
+        }
     }
-  }
 }

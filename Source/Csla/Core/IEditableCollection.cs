@@ -24,7 +24,7 @@ namespace Csla.Core
     /// collection.
     /// </summary>
     /// <param name="child">Child object to be removed.</param>
-    void RemoveChild(IEditableBusinessObject child);
+    void RemoveChild(Core.IEditableBusinessObject child);
     /// <summary>
     /// Used by BusinessListBase as a child object is 
     /// created to tell the child object about its

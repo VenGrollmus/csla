@@ -23,16 +23,16 @@ namespace Csla.Threading
     private ApplicationContext _applicationContext;
 
     public IPrincipal User { get; }
-    public Core.IContextDictionary ClientContext { get; }
+    public Csla.Core.ContextDictionary ClientContext { get; }
     public CultureInfo UICulture { get; }
     public CultureInfo Culture { get; }
 
     public ContextParams()
     {
-      User = _applicationContext.User;
-      ClientContext = _applicationContext.ClientContext;
-      Culture = CultureInfo.CurrentCulture;
-      UICulture = CultureInfo.CurrentUICulture;
+      this.User = _applicationContext.User;
+      this.ClientContext = _applicationContext.ClientContext;
+      this.Culture = System.Globalization.CultureInfo.CurrentCulture;
+      this.UICulture = System.Globalization.CultureInfo.CurrentUICulture;
     }
 
     internal void SetThreadContext()

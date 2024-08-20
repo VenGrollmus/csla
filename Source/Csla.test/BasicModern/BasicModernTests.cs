@@ -15,7 +15,6 @@ namespace Csla.Test.BasicModern
     {
       var services = new ServiceCollection();
       services.AddCsla(o => o.Binding(bo => bo.PropertyChangedMode = ApplicationContext.PropertyChangedModes.Xaml));
-      services.AddScoped<Csla.Core.IContextManager, Csla.Core.ApplicationContextManagerAsyncLocal>();
       var serviceProvider = services.BuildServiceProvider();
       _testDIContext = new TestDIContext(serviceProvider);
     }
@@ -23,10 +22,10 @@ namespace Csla.Test.BasicModern
     [TestMethod]
     public void EditLevelsWorkWithMobileFormatter()
     {
-      var oldSetting = ConfigurationManager.AppSettings["CslaSerializationFormatter"];
+      var oldSetting = Configuration.ConfigurationManager.AppSettings["CslaSerializationFormatter"];
       try
       {
-        ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", "MobileFormatter");
+        Configuration.ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", "MobileFormatter");
 
         var root = NewRoot();
 
@@ -46,17 +45,17 @@ namespace Csla.Test.BasicModern
       }
       finally
       {
-        ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", oldSetting);
+        Configuration.ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", oldSetting);
       }
     }
 
     [TestMethod]
     public void CloneWorkswithMobileFormatter()
     {
-      var oldSetting = ConfigurationManager.AppSettings["CslaSerializationFormatter"];
+      var oldSetting = Configuration.ConfigurationManager.AppSettings["CslaSerializationFormatter"];
       try
       {
-        ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", "MobileFormatter");
+        Configuration.ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", "MobileFormatter");
 
         var original = NewRoot();
 
@@ -82,7 +81,7 @@ namespace Csla.Test.BasicModern
       }
       finally
       {
-        ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", oldSetting);
+        Configuration.ConfigurationManager.AppSettings.Set("CslaSerializationFormatter", oldSetting);
       }
     }
 

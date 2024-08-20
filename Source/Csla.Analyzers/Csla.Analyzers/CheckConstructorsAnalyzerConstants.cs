@@ -1,69 +1,30 @@
-﻿using Csla.Analyzers.Properties;
-using Microsoft.CodeAnalysis;
-
-namespace Csla.Analyzers
+﻿namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   public static class PublicNoArgumentConstructorIsMissingConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
     public const string HasNonPublicNoArgumentConstructor = "HasNonPublicNoArgumentConstructor";
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Title = new LocalizableResourceString(nameof(Resources.PublicNoArgumentConstructorIsMissing_Title), Resources.ResourceManager, typeof(Resources));
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Message = new LocalizableResourceString(nameof(Resources.PublicNoArgumentConstructorIsMissing_Message), Resources.ResourceManager, typeof(Resources));
+    public const string Title = "Find CSLA Business Objects That do not Have Public No-Arugment Constructors";
+    public const string IdentifierText = "PublicNoArgumentConstructorIsMissing";
+    public const string Message = "CSLA business objects must have a public constructor with no arguments";
   }
 
-  /// <summary>
-  /// 
-  /// </summary>
   public static class ConstructorHasParametersConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Title = new LocalizableResourceString(nameof(Resources.ConstructorHasParameters_Title), Resources.ResourceManager, typeof(Resources));
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Message = new LocalizableResourceString(nameof(Resources.ConstructorHasParameters_Message), Resources.ResourceManager, typeof(Resources));
+    public const string Title = "Find CSLA Business Objects That Have Constructors With Parameters";
+    public const string IdentifierText = "ConstructorHasParameters";
+    public const string Message = "CSLA business objects should not have public constructors with parameters";
   }
 
-  /// <summary>
-  /// 
-  /// </summary>
   public static class FindBusinessObjectCreationConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Title = new LocalizableResourceString(nameof(Resources.FindBusinessObjectCreationConstants_Title), Resources.ResourceManager, typeof(Resources));
-    /// <summary>
-    /// 
-    /// </summary>
-    public static readonly LocalizableResourceString Message = new LocalizableResourceString(nameof(Resources.FindBusinessObjectCreationConstants_Message), Resources.ResourceManager, typeof(Resources));
+    public const string Title = "Find CSLA Business Objects That Are Created Outside of a ObjectFactory";
+    public const string IdentifierText = "BusinessObjectCreated";
+    public const string Message = "CSLA business objects should not be created outside of a ObjectFactory instance";
   }
 
-  /// <summary>
-  /// 
-  /// </summary>
   public static class CheckConstructorsAnalyzerPublicConstructorCodeFixConstants
   {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static string AddPublicConstructorDescription => Resources.CheckConstructorsAnalyzerPublicConstructor_AddPublicConstructorDescription;
-    /// <summary>
-    /// 
-    /// </summary>
-    public static string UpdateNonPublicConstructorToPublicDescription => Resources.CheckConstructorsAnalyzerPublicConstructor_UpdateNonPublicConstructorToPublicDescription;
+    public const string AddPublicConstructorDescription = "Add public constructor with no arguments";
+    public const string UpdateNonPublicConstructorToPublicDescription = "Update non-public constructor to public";
   }
 }

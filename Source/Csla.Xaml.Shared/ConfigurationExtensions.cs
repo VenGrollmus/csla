@@ -5,70 +5,114 @@
 // </copyright>
 // <summary>Implement extension methods for .NET Core configuration</summary>
 //-----------------------------------------------------------------------
+#if MAUI
+using System;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Csla.Xaml;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Csla.Configuration;
-
-/// <summary>
-/// Implement extension methods for Xaml
-/// </summary>
-public static class XamlConfigurationExtensions
+namespace Csla.Configuration
 {
   /// <summary>
-  /// Registers services necessary for Xaml-based
-  /// environments.
+  /// Implement extension methods for Xaml
   /// </summary>
-  /// <param name="config">CslaConfiguration object</param>
-  public static CslaOptions AddXaml(this CslaOptions config)
+  public static class XamlConfigurationExtensions
   {
-    return AddXaml(config, null);
+    /// <summary>
+    /// Registers services necessary for Xaml-based
+    /// environments.
+    /// </summary>
+    /// <param name="config">CslaConfiguration object</param>
+    public static CslaOptions AddXaml(this CslaOptions config)
+    {
+      return AddXaml(config, null);
+    }
+
+    /// <summary>
+    /// Registers services necessary for Xaml-based
+    /// environments.
+    /// </summary>
+    /// <param name="config">CslaConfiguration object</param>
+    /// <param name="options">XamlOptions action</param>
+    public static CslaOptions AddXaml(this CslaOptions config, Action<XamlOptions> options)
+    {
+      var xamlOptions = new XamlOptions();
+      options?.Invoke(xamlOptions);
+
+      // use correct mode for raising PropertyChanged events
+      config.BindingOptions.PropertyChangedMode = ApplicationContext.PropertyChangedModes.Xaml;
+
+      return config;
+    }
   }
 
   /// <summary>
-  /// Registers services necessary for Xaml-based
-  /// environments.
+  /// Configuration options for AddXaml method
   /// </summary>
-  /// <param name="config">CslaConfiguration object</param>
-  /// <param name="options">XamlOptions action</param>
-  public static CslaOptions AddXaml(this CslaOptions config, Action<XamlOptions> options)
+  public class XamlOptions
   {
-    var xamlOptions = new XamlOptions();
-    options?.Invoke(xamlOptions);
 
-    // use correct IContextManager
-    config.Services.AddSingleton<Csla.Core.IContextManager, ApplicationContextManager>();
-
-    // use correct mode for raising PropertyChanged events
-    config.BindingOptions.PropertyChangedMode = ApplicationContext.PropertyChangedModes.Xaml;
-
-#if !MAUI
-    config.Services.AddTransient(typeof(ViewModel<>), typeof(ViewModel<>));
-#endif
-
-    return config;
   }
-
-#if !MAUI
-  /// <summary>
-  /// Initializes CSLA for use by Xaml apps.
-  /// </summary>
-  /// <param name="host"></param>
-  public static IHost UseCsla(this IHost host)
-  {
-    // create instance of ApplicationContext so the
-    // Csla.Xaml.ApplicationContextManager gets a static
-    // reference for use by UI helpers.
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
-    var context = host.Services.GetService(typeof(ApplicationContext));
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
-    return host;
-  }
-#endif
 }
+#elif !XAMARIN && !NETFX_CORE
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Csla.Xaml;
+using Microsoft.Extensions.Hosting;
 
-/// <summary>
-/// Configuration options for AddXaml method
-/// </summary>
-public class XamlOptions;
+namespace Csla.Configuration
+{
+  /// <summary>
+  /// Implement extension methods for Xaml
+  /// </summary>
+  public static class XamlConfigurationExtensions
+  {
+    /// <summary>
+    /// Registers services necessary for Xaml-based
+    /// environments.
+    /// </summary>
+    /// <param name="config">CslaConfiguration object</param>
+    public static CslaOptions AddXaml(this CslaOptions config)
+    {
+      return AddXaml(config, null);
+    }
+
+    /// <summary>
+    /// Registers services necessary for Xaml-based
+    /// environments.
+    /// </summary>
+    /// <param name="config">CslaConfiguration object</param>
+    /// <param name="options">XamlOptions action</param>
+    public static CslaOptions AddXaml(this CslaOptions config, Action<XamlOptions> options)
+    {
+      var xamlOptions = new XamlOptions();
+      options?.Invoke(xamlOptions);
+
+      // use correct mode for raising PropertyChanged events
+      config.BindingOptions.PropertyChangedMode = ApplicationContext.PropertyChangedModes.Xaml;
+
+      config.Services.TryAddTransient(typeof(ViewModel<>), typeof(ViewModel<>));
+      return config;
+    }
+
+    /// <summary>
+    /// Initializes CSLA for use by Xaml apps.
+    /// </summary>
+    /// <param name="host"></param>
+    public static IHost UseCsla(this IHost host)
+    {
+      // create instance of ApplicationContext so the
+      // Csla.Xaml.ApplicationContextManager gets a static
+      // reference for use by UI helpers.
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+      var context = host.Services.GetService(typeof(ApplicationContext));
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
+      return host;
+    }
+  }
+
+  /// <summary>
+  /// Configuration options for AddXaml method
+  /// </summary>
+  public class XamlOptions;
+}
+#endif

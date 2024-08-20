@@ -22,19 +22,19 @@ namespace Csla.Windows
     public BusyAnimation()
     {
       InitializeComponent();
-      SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-      BusyProgressBar.GetType().GetMethod("SetStyle", System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase).Invoke(BusyProgressBar, [ControlStyles.SupportsTransparentBackColor, true]);
+      this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+      this.BusyProgressBar.GetType().GetMethod("SetStyle", System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase).Invoke(this.BusyProgressBar, [ControlStyles.SupportsTransparentBackColor, true]);
       if (!IsInDesignMode)
-        BusyProgressBar.BackColor = _progressBarBackColor;
+        this.BusyProgressBar.BackColor = _progressBarBackColor;
     }
 
-    private Color _progressBarForeColor = Color.LawnGreen;
+    private Color _progressBarForeColor = System.Drawing.Color.LawnGreen;
     /// <summary>
     /// Set or get foreground color for busy animation's progress bar
     /// </summary>
     [Category("Csla")]
     [Description("Foreground color for busy animation's progress bar.")]
-    [DefaultValue(typeof(Color), "LawnGreen")]
+    [DefaultValue(typeof(System.Drawing.Color), "LawnGreen")]
     [Browsable(true)]
     public Color ProgressBarForeColor
     {
@@ -45,18 +45,18 @@ namespace Csla.Windows
       set
       {
         _progressBarForeColor = value;
-        BusyProgressBar.ForeColor = _progressBarForeColor;
+        this.BusyProgressBar.ForeColor = _progressBarForeColor;
       }
     }
 
 
-    private Color _progressBarBackColor = Color.White;
+    private Color _progressBarBackColor = System.Drawing.Color.White;
     /// <summary>
     /// Set or get background color for busy animation's progress bar 
     /// </summary>
     [Category("Csla")]
     [Description("Background color for busy animation's progress bar.")]
-    [DefaultValue(typeof(Color), "White")]
+    [DefaultValue(typeof(System.Drawing.Color), "White")]
     [Browsable(true)]
     public Color ProgressBarBackColor
     {
@@ -67,7 +67,7 @@ namespace Csla.Windows
       set
       {
         _progressBarBackColor = value;
-        BusyProgressBar.BackColor = _progressBarBackColor;
+        this.BusyProgressBar.BackColor = _progressBarBackColor;
       }
     }
 
@@ -98,9 +98,9 @@ namespace Csla.Windows
     {
       if (!IsInDesignMode)
       {
-        Visible = run;
-        BusyProgressBar.Visible = run;
-        ProgressTimer.Enabled = run;
+        this.Visible = run;
+        this.BusyProgressBar.Visible = run;
+        this.ProgressTimer.Enabled = run;
       }
     }
 
@@ -109,14 +109,14 @@ namespace Csla.Windows
     {
       if (_isRunning)
       {
-        int newValue = BusyProgressBar.Value + BusyProgressBar.Step;
-        if (newValue > BusyProgressBar.Maximum)
+        int newValue = this.BusyProgressBar.Value + this.BusyProgressBar.Step;
+        if (newValue > this.BusyProgressBar.Maximum)
         {
-          BusyProgressBar.Value = 0;
+          this.BusyProgressBar.Value = 0;
         }
         else
         {
-          BusyProgressBar.Value = newValue;
+          this.BusyProgressBar.Value = newValue;
         }
       }
     }
@@ -125,7 +125,7 @@ namespace Csla.Windows
     {
       get
       {
-        if (GetService(typeof(System.ComponentModel.Design.IDesignerHost)) != null)
+        if (this.GetService(typeof(System.ComponentModel.Design.IDesignerHost)) != null)
           return true;
         else
           return false;
@@ -136,8 +136,8 @@ namespace Csla.Windows
     {
       if (IsInDesignMode)
       {
-        BusyProgressBar.Value = BusyProgressBar.Maximum / 2;
-        BusyProgressBar.Visible = true;
+        this.BusyProgressBar.Value = this.BusyProgressBar.Maximum / 2;
+        this.BusyProgressBar.Visible = true;
       }
     }
 

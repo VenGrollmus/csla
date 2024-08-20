@@ -8,7 +8,7 @@
 
 namespace Csla.Test.AppContext
 {
-  [Serializable]
+  [Serializable()]
   class SimpleRoot : BusinessBase<SimpleRoot>
   {
     private string _Data = string.Empty;
@@ -18,7 +18,7 @@ namespace Csla.Test.AppContext
     /// </summary>
     protected override object GetIdValue()
     {
-      return _Data;
+      return this._Data;
     }
 
     /// <summary>
@@ -26,13 +26,13 @@ namespace Csla.Test.AppContext
     /// </summary>
     public string Data
     {
-      get { return _Data; }
+      get { return this._Data; }
       set
       {
-        if (!_Data.Equals(value))
+        if (!this._Data.Equals(value))
         {
-          _Data = value;
-          MarkDirty();
+          this._Data = value;
+          this.MarkDirty();
         }
       }
     }
@@ -40,7 +40,7 @@ namespace Csla.Test.AppContext
     /// <summary>
     /// Criteria for DataPortal overrides
     /// </summary>
-    [Serializable]
+    [Serializable()]
     internal class Criteria
     {
       public const string DefaultData = "<new>";
@@ -49,18 +49,18 @@ namespace Csla.Test.AppContext
 
       public string Data
       {
-        get { return _Data; }
-        set { _Data = value; }
+        get { return this._Data; }
+        set { this._Data = value; }
       }
 
       public Criteria()
       {
-        _Data = DefaultData;
+        this._Data = Criteria.DefaultData;
       }
 
       public Criteria(string Data)
       {
-        _Data = Data;
+        this._Data = Data;
       }
     }
 
@@ -71,7 +71,7 @@ namespace Csla.Test.AppContext
     private void DataPortal_Create(object criteria)
     {
       Criteria crit = criteria as Criteria;
-      _Data = crit.Data;
+      this._Data = crit.Data;
 
       TestResults.Add("Root", "Created");
     }
@@ -83,9 +83,9 @@ namespace Csla.Test.AppContext
     protected void DataPortal_Fetch(object criteria)
     {
       Criteria crit = criteria as Criteria;
-      _Data = crit.Data;
+      this._Data = crit.Data;
 
-      MarkOld();
+      this.MarkOld();
       TestResults.Add("Root", "Fetched");
     }
 
@@ -95,20 +95,20 @@ namespace Csla.Test.AppContext
     [Update]
     protected void DataPortal_Update()
     {
-      if (IsDeleted)
+      if (this.IsDeleted)
       {
         TestResults.Add("Root", "Deleted");
-        MarkNew();
+        this.MarkNew();
       }
       else
       {
-        if (IsNew)
+        if (this.IsNew)
         {
           TestResults.Add("Root", "Inserted");
         }
         else TestResults.Add("Root", "Updated");
 
-        MarkOld();
+        this.MarkOld();
       }
     }
 

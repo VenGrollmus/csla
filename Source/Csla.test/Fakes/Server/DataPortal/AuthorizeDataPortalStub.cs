@@ -8,7 +8,7 @@
 using System.Security;
 using Csla.Server;
 
-namespace Csla.Testing.Business.DataPortal
+namespace  Csla.Testing.Business.DataPortal
 {
   public class AuthorizeDataPortalStub : IAuthorizeDataPortal
   {
@@ -16,10 +16,9 @@ namespace Csla.Testing.Business.DataPortal
 
     #region IAuthorizeDataPortal Members
 
-    public Task AuthorizeAsync(AuthorizeRequest clientRequest, CancellationToken ct)
+    public void Authorize(AuthorizeRequest clientRequest)
     {
       ClientRequest = clientRequest;
-      return Task.CompletedTask;
     }
 
     #endregion
@@ -31,14 +30,12 @@ namespace Csla.Testing.Business.DataPortal
 
     #region IAuthorizeDataPortal Members
 
-    public Task AuthorizeAsync(AuthorizeRequest clientRequest, CancellationToken ct)
+    public void Authorize(AuthorizeRequest clientRequest)
     {
       ClientRequest = clientRequest;
 
-      if (!typeof(Csla.Core.ICommandObject).IsAssignableFrom(clientRequest.ObjectType))
+      if(!typeof(Csla.Core.ICommandObject).IsAssignableFrom(clientRequest.ObjectType))
         throw new SecurityException("Authorization Failed");
-
-      return Task.CompletedTask;
     }
 
     #endregion

@@ -9,7 +9,7 @@
 namespace Csla.Test.Basic
 {
   [Serializable]
-  public class CommandObject : CommandBase<CommandObject>
+  public class CommandObject : Csla.CommandBase<CommandObject>
   {
 
     private static object locker = new object();

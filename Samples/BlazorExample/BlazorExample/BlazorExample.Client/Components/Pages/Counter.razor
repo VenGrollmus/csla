@@ -12,7 +12,7 @@
 
 @if (IsInteractive)
 {
-    <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+  <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 }
 
 @code {
@@ -25,10 +25,9 @@
     {
         // Every page _must_ initialize the state manager
         await StateManager.InitializeAsync();
-        if (applicationContext.LocalContext.Contains("counter"))
+        if (applicationContext.LocalContext.Contains("Counter"))
         {
-            var value = applicationContext.LocalContext["counter"];
-            currentCount = value == null ? 0 : (int)value;
+            currentCount = (int)applicationContext.LocalContext["Counter"];
         }
     }
 
@@ -45,6 +44,7 @@
     private void IncrementCount()
     {
         currentCount++;
-        applicationContext.LocalContext["counter"] = currentCount;
+        applicationContext.LocalContext["Counter"] = currentCount;
+        StateManager.SaveState();
     }
 }

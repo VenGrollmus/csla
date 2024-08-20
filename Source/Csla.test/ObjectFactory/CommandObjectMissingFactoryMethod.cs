@@ -8,7 +8,7 @@
 
 namespace Csla.Test.ObjectFactory
 {
-  [Server.ObjectFactory("Csla.Test.ObjectFactory.CommandObjectFactory, Csla.Test", null, null, null, null, "ExecuteMissingMethod")]
+  [Csla.Server.ObjectFactory("Csla.Test.ObjectFactory.CommandObjectFactory, Csla.Test", null, null, null, null, "ExecuteMissingMethod")]
   [Serializable]
   public class CommandObjectMissingFactoryMethod : CommandBase<CommandObjectMissingFactoryMethod>
   {

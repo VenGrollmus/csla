@@ -72,14 +72,14 @@ namespace Csla.Testing.Business.BusyStatus
       BusinessRules.AddRule(new TwoSecondsLongRule(RuleFieldProperty));
     }
 
-    public class TwoSecondsLongRule : BusinessRuleAsync
+    public class TwoSecondsLongRule : Rules.BusinessRuleAsync
     {
-      public TwoSecondsLongRule(Core.IPropertyInfo primaryProperty)
+      public TwoSecondsLongRule(Csla.Core.IPropertyInfo primaryProperty)
         : base(primaryProperty)
       {
         IsAsync = true;
-        InputProperties.Add(primaryProperty);
-        RunMode = RunModes.DenyOnServerSidePortal | RunModes.DenyCheckRules;
+        InputProperties = [primaryProperty];
+        base.RunMode = RunModes.DenyOnServerSidePortal | RunModes.DenyCheckRules;
       }
 
       protected override async Task ExecuteAsync(IRuleContext context)
@@ -119,38 +119,38 @@ namespace Csla.Testing.Business.BusyStatus
     [Fetch]
     internal void DataPortal_Fetch(string criteria)
     {
-      Id = "fetch_" + criteria;
-      OperationResult = "DataPortal_Fetch/with parameters";
+      this.Id = "fetch_" + criteria;
+      this.OperationResult = "DataPortal_Fetch/with parameters";
     }
 
     [Create]
     protected void DataPortal_Create()
     {
-      Id = "random_create";
-      OperationResult = "DataPortal_Create/no parameters";
+      this.Id = "random_create";
+      this.OperationResult = "DataPortal_Create/no parameters";
     }
 
     [Insert]
     protected void DataPortal_Insert()
     {
-      Id = "random_insert";
-      OperationResult = "DataPortal_Insert";
-      MarkOld();
+      this.Id = "random_insert";
+      this.OperationResult = "DataPortal_Insert";
+      this.MarkOld();
     }
 
     [Update]
     protected void DataPortal_Update()
     {
-      Id = "random_update";
-      OperationResult = "DataPortal_Update";
-      MarkOld();
+      this.Id = "random_update";
+      this.OperationResult = "DataPortal_Update";
+      this.MarkOld();
     }
 
     internal void Update()
     {
-      Id = "random_update";
-      OperationResult = "DataPortal_Update";
-      MarkOld();
+      this.Id = "random_update";
+      this.OperationResult = "DataPortal_Update";
+      this.MarkOld();
     }
   }
 }

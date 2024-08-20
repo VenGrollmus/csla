@@ -16,7 +16,7 @@ namespace Csla.Core
   /// </summary>
   /// <typeparam name="K">Key value: any primitive or IMobileObject type.</typeparam>
   /// <typeparam name="V">Value: any primitive or IMobileObject type.</typeparam>
-  [Serializable]
+  [Serializable()]
   public class MobileDictionary<K, V> : Dictionary<K, V>, IMobileObject
   {
     private bool _keyIsMobile;
@@ -76,13 +76,13 @@ namespace Csla.Core
     /// <param name="key">Key value</param>
     public bool Contains(K key)
     {
-      return ContainsKey(key);
+      return base.ContainsKey(key);
     }
 
     private void DetermineTypes()
     {
-      _keyIsMobile = typeof(IMobileObject).IsAssignableFrom(typeof(K));
-      _valueIsMobile = typeof(IMobileObject).IsAssignableFrom(typeof(V));
+      _keyIsMobile = typeof(Csla.Serialization.Mobile.IMobileObject).IsAssignableFrom(typeof(K));
+      _valueIsMobile = typeof(Csla.Serialization.Mobile.IMobileObject).IsAssignableFrom(typeof(V));
     }
 
     #region IMobileObject Members
@@ -92,7 +92,7 @@ namespace Csla.Core
 
     void IMobileObject.GetState(SerializationInfo info)
     {
-      info.AddValue("count", Keys.Count);
+      info.AddValue("count", this.Keys.Count);
       GetState(info);
     }
 
@@ -106,7 +106,7 @@ namespace Csla.Core
     void IMobileObject.GetChildren(SerializationInfo info, MobileFormatter formatter)
     {
       int count = 0;
-      foreach (var key in Keys)
+      foreach (var key in this.Keys)
       {
         if (_keyIsMobile)
         {

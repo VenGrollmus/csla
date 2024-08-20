@@ -14,7 +14,7 @@ namespace Csla.Threading
   /// A BackgroundWorker that wraps a System.ComponentModel.BackgroundWorkertransfers ApplicationContext.User, ClientContext, CurrentCulture 
   /// and CurrentUICulture to the background thread.
   /// </summary>
-  public class BackgroundWorker : Component
+  public class BackgroundWorker : System.ComponentModel.Component
   {
     private readonly System.ComponentModel.BackgroundWorker _myWorker = new System.ComponentModel.BackgroundWorker();
     /// <summary>
@@ -171,7 +171,7 @@ namespace Csla.Threading
       public WorkerAsyncRequest(ApplicationContext applicationContext, object argument)
         : base(applicationContext)
       {
-        Argument = argument;
+        this.Argument = argument;
       }
     }
 
@@ -183,8 +183,8 @@ namespace Csla.Threading
 
       public WorkerAsyncResult(object result, Exception error)
       {
-        Result = result;
-        Error = error;
+        this.Result = result;
+        this.Error = error;
       }
     }
 
@@ -241,13 +241,17 @@ namespace Csla.Threading
       {
         var doWorkEventArgs = new DoWorkEventArgs(request.Argument);
         _myDoWork?.Invoke(this, doWorkEventArgs);
+#pragma warning disable CS0618 // Type or member is obsolete
         e.Result = new WorkerAsyncResult(doWorkEventArgs.Result, null);
+#pragma warning restore CS0618 // Type or member is obsolete
         e.Cancel = doWorkEventArgs.Cancel;
       }
       // must implement exception handling and return exception in WorkerAsyncResult
       catch (Exception ex)
       {
+#pragma warning disable CS0618 // Type or member is obsolete
         e.Result = new WorkerAsyncResult(null, ex);
+#pragma warning restore CS0618 // Type or member is obsolete
       }
     }
 

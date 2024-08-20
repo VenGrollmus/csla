@@ -101,19 +101,19 @@ namespace Csla.Blazor.WebAssembly
     /// <summary>
     /// Gets the local context.
     /// </summary>
-    public IContextDictionary GetLocalContext()
+    public ContextDictionary GetLocalContext()
     {
-      IContextDictionary localContext;
+      ContextDictionary localContext;
       var sessionManager = ApplicationContext.GetRequiredService<ISessionManager>();
       var session = sessionManager.GetCachedSession();
       session.TryGetValue("localContext", out var result);
-      if (result is IContextDictionary context)
+      if (result is ContextDictionary context)
       {
         localContext = context;
       }
       else
       {
-        localContext = new ContextDictionary();
+        localContext = [];
         SetLocalContext(localContext);
       }
       return localContext;
@@ -123,7 +123,7 @@ namespace Csla.Blazor.WebAssembly
     /// Sets the local context.
     /// </summary>
     /// <param name="localContext">Local context.</param>
-    public void SetLocalContext(IContextDictionary localContext)
+    public void SetLocalContext(ContextDictionary localContext)
     {
       var sessionManager = ApplicationContext.GetRequiredService<ISessionManager>();
       var session = sessionManager.GetCachedSession();
@@ -134,19 +134,19 @@ namespace Csla.Blazor.WebAssembly
     /// Gets the client context.
     /// </summary>
     /// <param name="executionLocation"></param>
-    public IContextDictionary GetClientContext(ApplicationContext.ExecutionLocations executionLocation)
+    public ContextDictionary GetClientContext(ApplicationContext.ExecutionLocations executionLocation)
     {
-      IContextDictionary clientContext;
+      ContextDictionary clientContext;
       var sessionManager = ApplicationContext.GetRequiredService<ISessionManager>();
       var session = sessionManager.GetCachedSession();
       session.TryGetValue("clientContext", out var result);
-      if (result is IContextDictionary context)
+      if (result is ContextDictionary context)
       {
         clientContext = context;
       }
       else
       {
-        clientContext = new ContextDictionary();
+        clientContext = [];
         SetClientContext(clientContext, ApplicationContext.ExecutionLocation);
       }
       return clientContext;
@@ -157,7 +157,7 @@ namespace Csla.Blazor.WebAssembly
     /// </summary>
     /// <param name="clientContext">Client context.</param>
     /// <param name="executionLocation"></param>
-    public void SetClientContext(IContextDictionary clientContext, ApplicationContext.ExecutionLocations executionLocation)
+    public void SetClientContext(ContextDictionary clientContext, ApplicationContext.ExecutionLocations executionLocation)
     {
       var sessionManager = ApplicationContext.GetRequiredService<ISessionManager>();
       var session = sessionManager.GetCachedSession();

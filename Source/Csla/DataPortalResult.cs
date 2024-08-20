@@ -49,24 +49,24 @@ namespace Csla
     /// </param>
     public DataPortalResult(T obj, Exception ex, object userState)
     {
-      Object = obj;
-      Error = ex;
-      UserState = userState;
+      this.Object = obj;
+      this.Error = ex;
+      this.UserState = userState;
     }
 
     object IDataPortalResult.Object
     {
-      get { return Object; }
+      get { return this.Object; }
     }
 
     Exception IDataPortalResult.Error
     {
-      get { return Error; }
+      get { return this.Error; }
     }
 
     object IDataPortalResult.UserState
     {
-      get { return UserState; }
+      get { return this.UserState; }
     }
   }
 }

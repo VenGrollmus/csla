@@ -55,7 +55,7 @@ namespace Csla.Core
     public ChildChangedEventArgs(object childObject, PropertyChangedEventArgs propertyArgs, ListChangedEventArgs listArgs)
       : this(childObject, propertyArgs)
     {
-      ListChangedArgs = listArgs;
+      this.ListChangedArgs = listArgs;
     }
 
     /// <summary>
@@ -69,8 +69,8 @@ namespace Csla.Core
     /// </param>
     public ChildChangedEventArgs(object childObject, PropertyChangedEventArgs propertyArgs)
     {
-      ChildObject = childObject;
-      PropertyChangedArgs = propertyArgs;
+      this.ChildObject = childObject;
+      this.PropertyChangedArgs = propertyArgs;
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ namespace Csla.Core
     public ChildChangedEventArgs(object childObject, PropertyChangedEventArgs propertyArgs, NotifyCollectionChangedEventArgs listArgs)
       : this(childObject, propertyArgs)
     {
-      CollectionChangedArgs = listArgs;
+      this.CollectionChangedArgs = listArgs;
     }
   }
 }

@@ -17,7 +17,7 @@ namespace Csla.Rules
     /// <summary>
     /// Gets the rule object.
     /// </summary>
-    IAuthorizationRuleBase Rule { get; }
+    IAuthorizationRule Rule { get; }
 
     /// <summary>
     /// Gets a reference to the target business object.

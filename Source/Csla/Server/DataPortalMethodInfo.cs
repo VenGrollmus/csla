@@ -11,7 +11,7 @@ namespace Csla.Server
   internal class DataPortalMethodInfo
   {
     public bool RunLocal { get; private set; }
-#if !(ANDROID || IOS) 
+#if !(ANDROID || IOS) && !NETFX_CORE 
     public TransactionalAttribute TransactionalAttribute { get; private set; }
 #else
     public TransactionalTypes TransactionalType { get; private set; }
@@ -19,7 +19,7 @@ namespace Csla.Server
 
     public DataPortalMethodInfo()
     {
-#if !(ANDROID || IOS) 
+#if !(ANDROID || IOS) && !NETFX_CORE 
       TransactionalAttribute = new TransactionalAttribute(TransactionalTypes.Manual);
 #else
       TransactionalType = TransactionalTypes.Manual;
@@ -33,7 +33,7 @@ namespace Csla.Server
       if (info != null)
       {
         RunLocal = IsRunLocal(info);
-#if !(ANDROID || IOS) 
+#if !(ANDROID || IOS) && !NETFX_CORE 
         TransactionalAttribute = GetTransactionalAttribute(info);
 #else
         TransactionalType = TransactionalTypes.Manual;
@@ -42,11 +42,19 @@ namespace Csla.Server
     }
 
     private static bool IsRunLocal(System.Reflection.MethodInfo method)
-      => Attribute.IsDefined(method, typeof(RunLocalAttribute), false);
+    {
+#if NETFX_CORE
+      return method.CustomAttributes.Count(r => r.AttributeType.Equals(typeof(RunLocalAttribute))) > 0;
+#else
+      return Attribute.IsDefined(method, typeof(RunLocalAttribute), false);
+#endif
+    }
 
-#if !(ANDROID || IOS)
+#if !(ANDROID || IOS) && !NETFX_CORE 
     private static bool IsTransactionalMethod(System.Reflection.MethodInfo method)
-      => Attribute.IsDefined(method, typeof(TransactionalAttribute));
+    {
+      return Attribute.IsDefined(method, typeof(TransactionalAttribute));
+    }
 
     private static TransactionalAttribute GetTransactionalAttribute(System.Reflection.MethodInfo method)
     {

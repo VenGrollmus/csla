@@ -14,9 +14,9 @@ namespace Csla.Analyzers.Tests
       Assert.AreEqual(2, diagnostics.Length);
 
       var saveDiagnostic = diagnostics.Single(_ => _.Id == Constants.AnalyzerIdentifiers.FindSaveAssignmentIssue);
-      Assert.AreEqual("Find Save() Calls That Ignore the Result", saveDiagnostic.Title.ToString(),
+      Assert.AreEqual(FindSaveAssignmentIssueAnalyzerConstants.Title, saveDiagnostic.Title.ToString(),
         nameof(DiagnosticDescriptor.Title));
-      Assert.AreEqual("Do not ignore the result of Save()", saveDiagnostic.MessageFormat.ToString(),
+      Assert.AreEqual(FindSaveAssignmentIssueAnalyzerConstants.Message, saveDiagnostic.MessageFormat.ToString(),
         nameof(DiagnosticDescriptor.MessageFormat));
       Assert.AreEqual(Constants.Categories.Usage, saveDiagnostic.Category, 
         nameof(DiagnosticDescriptor.Category));
@@ -27,9 +27,9 @@ namespace Csla.Analyzers.Tests
         nameof(DiagnosticDescriptor.HelpLinkUri));
 
       var saveAsyncDiagnostic = diagnostics.Single(_ => _.Id == Constants.AnalyzerIdentifiers.FindSaveAsyncAssignmentIssue);
-      Assert.AreEqual("Find SaveAsync() Calls That Ignore the Result", saveAsyncDiagnostic.Title.ToString(),
+      Assert.AreEqual(FindSaveAsyncAssignmentIssueAnalyzerConstants.Title, saveAsyncDiagnostic.Title.ToString(),
         nameof(DiagnosticDescriptor.Title));
-      Assert.AreEqual("Do not ignore the result of SaveAsync()", saveAsyncDiagnostic.MessageFormat.ToString(),
+      Assert.AreEqual(FindSaveAsyncAssignmentIssueAnalyzerConstants.Message, saveAsyncDiagnostic.MessageFormat.ToString(),
         nameof(DiagnosticDescriptor.MessageFormat));
       Assert.AreEqual(Constants.Categories.Usage, saveAsyncDiagnostic.Category,
         nameof(DiagnosticDescriptor.Category));

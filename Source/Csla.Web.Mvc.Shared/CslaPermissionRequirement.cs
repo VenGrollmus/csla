@@ -5,7 +5,9 @@
 // </copyright>
 // <summary>Restricts callers to an action method.</summary>
 //-----------------------------------------------------------------------
-#if NETSTANDARD2_0 || NET8_0_OR_GREATER 
+#if NETSTANDARD2_0 || NET5_0_OR_GREATER || NETCOREAPP3_1
+using System;
+using System.Threading.Tasks;
 using Csla.Rules;
 using Microsoft.AspNetCore.Authorization;
 
@@ -57,11 +59,12 @@ namespace Csla.Web.Mvc
     /// Handles CSLA permissions
     /// </summary>
     /// <param name="context">Authorization handler context</param>
-    public override async Task HandleAsync(AuthorizationHandlerContext context)
+    public override Task HandleAsync(AuthorizationHandlerContext context)
     {
       foreach (var item in context.PendingRequirements)
         if (item is CslaPermissionRequirement cr)
-          await HandleRequirementAsync(context, cr);
+          HandleRequirementAsync(context, cr);
+      return Task.CompletedTask;
     }
 
     /// <summary>
@@ -69,13 +72,14 @@ namespace Csla.Web.Mvc
     /// </summary>
     /// <param name="context">Authorization handler context</param>
     /// <param name="requirement">CSLA permissions requirement</param>
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, 
       CslaPermissionRequirement requirement)
     {
-      if (context.User == null || context.User.Identity?.IsAuthenticated != true)
+      if (context.User == null || !context.User.Identity.IsAuthenticated)
         context.Fail();
-      else if (await BusinessRules.HasPermissionAsync(_applicationContext, requirement.Action, requirement.ObjectType, CancellationToken.None))
+      else if (BusinessRules.HasPermission(_applicationContext, requirement.Action, requirement.ObjectType))
         context.Succeed(requirement);
+      return Task.CompletedTask;
     }
   }
 }

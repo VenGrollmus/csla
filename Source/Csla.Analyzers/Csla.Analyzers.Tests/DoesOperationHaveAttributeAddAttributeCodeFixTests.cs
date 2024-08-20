@@ -23,107 +23,107 @@ namespace Csla.Analyzers.Tests
 
     [DataRow(CslaMemberConstants.Operations.DataPortalCreate,
         CslaMemberConstants.OperationAttributes.Create, true,
-        "Add attribute", 
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription, 
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalCreateAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalCreate,
         CslaMemberConstants.OperationAttributes.Create, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalCreateAndDoesNotHaveUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalFetch,
         CslaMemberConstants.OperationAttributes.Fetch, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalFetchAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalFetch,
         CslaMemberConstants.OperationAttributes.Fetch, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalFetchAndDoesNotHaveUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalInsert,
         CslaMemberConstants.OperationAttributes.Insert, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalInsertAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalInsert,
         CslaMemberConstants.OperationAttributes.Insert, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalInsertAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalUpdate,
         CslaMemberConstants.OperationAttributes.Update, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalUpdateAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalUpdate,
         CslaMemberConstants.OperationAttributes.Update, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalUpdateAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalDelete,
         CslaMemberConstants.OperationAttributes.Delete, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalDeleteAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalDelete,
         CslaMemberConstants.OperationAttributes.Delete, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalDeleteAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalDeleteSelf,
         CslaMemberConstants.OperationAttributes.DeleteSelf, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalDeleteSelfAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalDeleteSelf,
         CslaMemberConstants.OperationAttributes.DeleteSelf, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalDeleteSelfAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalExecute,
         CslaMemberConstants.OperationAttributes.Execute, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalExecuteAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.DataPortalExecute,
         CslaMemberConstants.OperationAttributes.Execute, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDataPortalExecuteAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildCreate,
         CslaMemberConstants.OperationAttributes.CreateChild, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsCreateChildAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildCreate,
         CslaMemberConstants.OperationAttributes.CreateChild, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsCreateChildAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildFetch,
         CslaMemberConstants.OperationAttributes.FetchChild, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsFetchChildAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildFetch,
         CslaMemberConstants.OperationAttributes.FetchChild, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsFetchChildAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildInsert,
         CslaMemberConstants.OperationAttributes.InsertChild, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsInsertChildAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildInsert,
         CslaMemberConstants.OperationAttributes.InsertChild, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsInsertChildAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildUpdate,
         CslaMemberConstants.OperationAttributes.UpdateChild, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsUpdateChildAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildUpdate,
         CslaMemberConstants.OperationAttributes.UpdateChild, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsUpdateChildAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildDeleteSelf,
         CslaMemberConstants.OperationAttributes.DeleteSelfChild, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDeleteSelfChildAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildDeleteSelf,
         CslaMemberConstants.OperationAttributes.DeleteSelfChild, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsDeleteSelfChildAndDoesNotHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildExecute,
         CslaMemberConstants.OperationAttributes.ExecuteChild, true,
-        "Add attribute",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsExecuteChildAndHasUsing")]
     [DataRow(CslaMemberConstants.Operations.ChildExecute,
         CslaMemberConstants.OperationAttributes.ExecuteChild, false,
-        "Add attribute and using statement",
+        DoesOperationHaveAttributeAnalyzerAddAttributeCodeFixConstants.AddAttributeAndUsingDescription,
       DisplayName = "VerifyGetFixesWhenOperationIsExecuteChildAndDoesNotHasUsing")]
     [DataTestMethod]
     public async Task VerifyGetFixes(string operationName, string attributeName, bool includeUsingCsla,

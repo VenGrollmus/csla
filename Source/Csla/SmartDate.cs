@@ -20,10 +20,14 @@ namespace Csla
   /// See Chapter 5 for a full discussion of the need for this
   /// data type and the design choices behind it.
   /// </remarks>
-  [Serializable]
-  [System.ComponentModel.TypeConverter(typeof(Core.TypeConverters.SmartDateConverter))]
-  public struct SmartDate : Core.ISmartField,
-    IConvertible,
+  [Serializable()]
+#if !NETFX_CORE
+  [System.ComponentModel.TypeConverter(typeof(Csla.Core.TypeConverters.SmartDateConverter))]
+#endif
+  public struct SmartDate : Csla.Core.ISmartField,
+#if !NETFX_CORE
+    IConvertible, 
+#endif
     IComparable, IFormattable, IMobileObject
   {
     private DateTime _date;
@@ -32,10 +36,12 @@ namespace Csla
     private string _format;
     private static string _defaultFormat;
 
+#if !NETFX_CORE
     [NonSerialized]
+#endif
     [NotUndoable]
     private static Func<string, DateTime?> _customParser;
-
+    
 #region EmptyValue enum
 
     /// <summary>
@@ -103,7 +109,7 @@ namespace Csla
     /// <param name="value">The initial value of the object.</param>
     public SmartDate(DateTime value)
     {
-      _emptyValue = EmptyValue.MinDate;
+      _emptyValue = Csla.SmartDate.EmptyValue.MinDate;
       _format = null;
       _initialized = false;
       _date = DateTime.MinValue;
@@ -163,7 +169,7 @@ namespace Csla
     /// <param name="value">The initial value of the object.</param>
     public SmartDate(DateTime? value)
     {
-      _emptyValue = EmptyValue.MinDate;
+      _emptyValue = Csla.SmartDate.EmptyValue.MinDate;
       _format = null;
       _initialized = false;
       _date = DateTime.MinValue;
@@ -219,7 +225,7 @@ namespace Csla
     /// <param name="value">The initial value of the object.</param>
     public SmartDate(DateTimeOffset value)
     {
-      _emptyValue = EmptyValue.MinDate;
+      _emptyValue = Csla.SmartDate.EmptyValue.MinDate;
       _format = null;
       _initialized = false;
       _date = DateTime.MinValue;
@@ -282,7 +288,7 @@ namespace Csla
       _format = null;
       _initialized = true;
       _date = DateTime.MinValue;
-      Text = value;
+      this.Text = value;
     }
 
     /// <summary>
@@ -296,7 +302,7 @@ namespace Csla
       _format = null;
       _initialized = true;
       _date = DateTime.MinValue;
-      Text = value;
+      this.Text = value;
     }
 
     /// <summary>
@@ -310,7 +316,7 @@ namespace Csla
       _format = null;
       _initialized = true;
       _date = DateTime.MinValue;
-      Text = value;
+      this.Text = value;
     }
 
     private static EmptyValue GetEmptyValue(bool emptyIsMin)
@@ -323,10 +329,10 @@ namespace Csla
 
     private void SetEmptyDate(EmptyValue emptyValue)
     {
-      if (emptyValue == EmptyValue.MinDate)
-        Date = DateTime.MinValue;
+      if (emptyValue == SmartDate.EmptyValue.MinDate)
+        this.Date = DateTime.MinValue;
       else
-        Date = DateTime.MaxValue;
+        this.Date = DateTime.MaxValue;
     }
 
 #endregion
@@ -392,8 +398,8 @@ namespace Csla
     /// </remarks>
     public string Text
     {
-      get { return DateToString(Date, FormatString, _emptyValue); }
-      set { Date = StringToDate(value, _emptyValue); }
+      get { return DateToString(this.Date, FormatString, _emptyValue); }
+      set { this.Date = StringToDate(value, _emptyValue); }
     }
 
 #endregion
@@ -409,7 +415,7 @@ namespace Csla
       {
         if (!_initialized)
         {
-          _date = _emptyValue == EmptyValue.MinDate ? DateTime.MinValue : DateTime.MaxValue;
+          _date = _emptyValue == SmartDate.EmptyValue.MinDate ? DateTime.MinValue : DateTime.MaxValue;
           _initialized = true;
         }
         return _date;
@@ -426,7 +432,7 @@ namespace Csla
     /// </summary>
     public DateTimeOffset ToDateTimeOffset()
     {
-      return new DateTimeOffset(Date);
+      return new DateTimeOffset(this.Date);
     }
 
     /// <summary>
@@ -434,10 +440,10 @@ namespace Csla
     /// </summary>
     public DateTime? ToNullableDate()
     {
-      if (IsEmpty)
+      if (this.IsEmpty)
         return new DateTime?();
       else
-        return new DateTime?(Date);
+        return new DateTime?(this.Date);
     }
 
 #endregion
@@ -449,7 +455,7 @@ namespace Csla
     /// </summary>
     public override string ToString()
     {
-      return Text;
+      return this.Text;
     }
 
     /// <summary>
@@ -461,9 +467,9 @@ namespace Csla
     public string ToString(string format)
     {
       if (string.IsNullOrEmpty(format))
-        return ToString();
+        return this.ToString();
       else
-        return DateToString(Date, format, _emptyValue);
+        return DateToString(this.Date, format, _emptyValue);
     }
 
     /// <summary>
@@ -475,15 +481,15 @@ namespace Csla
     {
       if (obj is SmartDate tmp)
       {
-        if (IsEmpty && tmp.IsEmpty)
+        if (this.IsEmpty && tmp.IsEmpty)
           return true;
         else
-          return Date.Equals(tmp.Date);
+          return this.Date.Equals(tmp.Date);
       }
       else if (obj is DateTime time)
-        return Date.Equals(time);
+        return this.Date.Equals(time);
       else if (obj is string)
-        return (CompareTo(obj.ToString()) == 0);
+        return (this.CompareTo(obj.ToString()) == 0);
       else
         return false;
     }
@@ -493,13 +499,14 @@ namespace Csla
     /// </summary>
     public override int GetHashCode()
     {
-      return Date.GetHashCode();
+      return this.Date.GetHashCode();
     }
 
 #endregion
 
 #region DBValue
 
+#if !NETFX_CORE
     /// <summary>
     /// Gets a database-friendly version of the date value.
     /// </summary>
@@ -521,12 +528,13 @@ namespace Csla
     {
       get
       {
-        if (IsEmpty)
+        if (this.IsEmpty)
           return DBNull.Value;
         else
-          return Date;
+          return this.Date;
       }
     }
+#endif
 
 #endregion
 
@@ -540,9 +548,9 @@ namespace Csla
       get
       {
         if (_emptyValue == EmptyValue.MinDate)
-          return Date.Equals(DateTime.MinValue);
+          return this.Date.Equals(DateTime.MinValue);
         else
-          return Date.Equals(DateTime.MaxValue);
+          return this.Date.Equals(DateTime.MaxValue);
       }
     }
 
@@ -635,7 +643,7 @@ namespace Csla
     /// <returns>A value indicating if the parse was successful.</returns>
     public static bool TryParse(string value, EmptyValue emptyValue, ref SmartDate result)
     {
-      DateTime dateResult = DateTime.MinValue;
+      System.DateTime dateResult = DateTime.MinValue;
       if (TryStringToDate(value, emptyValue, ref dateResult))
       {
         result = new SmartDate(dateResult, emptyValue);
@@ -830,7 +838,7 @@ namespace Csla
     /// <returns>A value indicating if the comparison date is less than, equal to or greater than this date.</returns>
     public int CompareTo(SmartDate value)
     {
-      if (IsEmpty && value.IsEmpty)
+      if (this.IsEmpty && value.IsEmpty)
         return 0;
       else
         return _date.CompareTo(value.Date);
@@ -861,7 +869,7 @@ namespace Csla
     /// <returns>A value indicating if the comparison date is less than, equal to or greater than this date.</returns>
     public int CompareTo(string value)
     {
-      return Date.CompareTo(StringToDate(value, _emptyValue));
+      return this.Date.CompareTo(StringToDate(value, _emptyValue));
     }
 
     /// <summary>
@@ -878,7 +886,7 @@ namespace Csla
     /// </remarks>
     public int CompareTo(DateTimeOffset value)
     {
-      return Date.CompareTo(value.DateTime);
+      return this.Date.CompareTo(value.DateTime);
     }
 
     /// <summary>
@@ -888,7 +896,7 @@ namespace Csla
     /// <returns>A value indicating if the comparison date is less than, equal to or greater than this date.</returns>
     public int CompareTo(DateTime value)
     {
-      return Date.CompareTo(value);
+      return this.Date.CompareTo(value);
     }
 
     /// <summary>
@@ -898,9 +906,9 @@ namespace Csla
     public DateTime Add(TimeSpan value)
     {
       if (IsEmpty)
-        return Date;
+        return this.Date;
       else
-        return Date.Add(value);
+        return this.Date.Add(value);
     }
 
     /// <summary>
@@ -910,9 +918,9 @@ namespace Csla
     public DateTime Subtract(TimeSpan value)
     {
       if (IsEmpty)
-        return Date;
+        return this.Date;
       else
-        return Date.Subtract(value);
+        return this.Date.Subtract(value);
     }
 
     /// <summary>
@@ -931,7 +939,7 @@ namespace Csla
       if (IsEmpty)
         return TimeSpan.Zero;
       else
-        return Date.Subtract(value.DateTime);
+        return this.Date.Subtract(value.DateTime);
     }
 
     /// <summary>
@@ -943,7 +951,7 @@ namespace Csla
       if (IsEmpty)
         return TimeSpan.Zero;
       else
-        return Date.Subtract(value);
+        return this.Date.Subtract(value);
     }
 
 #endregion
@@ -983,7 +991,7 @@ namespace Csla
     /// Convert a SmartDate to a DateTime.
     /// </summary>
     /// <param name="obj1">SmartDate value.</param>
-    public static implicit operator DateTime(SmartDate obj1)
+    public static implicit operator System.DateTime(SmartDate obj1)
     {
       return obj1.Date;
     }
@@ -992,7 +1000,7 @@ namespace Csla
     /// Convert a SmartDate to a nullable DateTime.
     /// </summary>
     /// <param name="obj1">SmartDate value.</param>
-    public static implicit operator DateTime?(SmartDate obj1)
+    public static implicit operator System.DateTime?(SmartDate obj1)
     {
       return obj1.ToNullableDate();
     }
@@ -1019,7 +1027,7 @@ namespace Csla
     /// Convert a value to a SmartDate.
     /// </summary>
     /// <param name="dateValue">Value to convert.</param>
-    public static implicit operator SmartDate(DateTime dateValue)
+    public static implicit operator SmartDate(System.DateTime dateValue)
     {
       return new SmartDate(dateValue);
     }
@@ -1028,7 +1036,7 @@ namespace Csla
     /// Convert a value to a SmartDate.
     /// </summary>
     /// <param name="dateValue">Value to convert.</param>
-    public static implicit operator SmartDate(DateTime? dateValue)
+    public static implicit operator SmartDate(System.DateTime? dateValue)
     {
       return new SmartDate(dateValue);
     }
@@ -1234,74 +1242,75 @@ namespace Csla
 
 #endregion
 
+#if !NETFX_CORE
 #region  IConvertible
 
-    TypeCode IConvertible.GetTypeCode()
+    System.TypeCode IConvertible.GetTypeCode()
     {
       return _date.GetTypeCode();
     }
 
-    bool IConvertible.ToBoolean(IFormatProvider provider)
+    bool IConvertible.ToBoolean(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToBoolean(provider);
     }
 
-    byte IConvertible.ToByte(IFormatProvider provider)
+    byte IConvertible.ToByte(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToByte(provider);
     }
 
-    char IConvertible.ToChar(IFormatProvider provider)
+    char IConvertible.ToChar(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToChar(provider);
     }
 
-    DateTime IConvertible.ToDateTime(IFormatProvider provider)
+    System.DateTime IConvertible.ToDateTime(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToDateTime(provider);
     }
 
-    decimal IConvertible.ToDecimal(IFormatProvider provider)
+    decimal IConvertible.ToDecimal(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToDecimal(provider);
     }
 
-    double IConvertible.ToDouble(IFormatProvider provider)
+    double IConvertible.ToDouble(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToDouble(provider);
     }
 
-    short IConvertible.ToInt16(IFormatProvider provider)
+    short IConvertible.ToInt16(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToInt16(provider);
     }
 
-    int IConvertible.ToInt32(IFormatProvider provider)
+    int IConvertible.ToInt32(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToInt32(provider);
     }
 
-    long IConvertible.ToInt64(IFormatProvider provider)
+    long IConvertible.ToInt64(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToInt64(provider);
     }
 
-    sbyte IConvertible.ToSByte(IFormatProvider provider)
+    sbyte IConvertible.ToSByte(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToSByte(provider);
     }
 
-    float IConvertible.ToSingle(IFormatProvider provider)
+    float IConvertible.ToSingle(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToSingle(provider);
     }
 
-    string IConvertible.ToString(IFormatProvider provider)
+    string IConvertible.ToString(System.IFormatProvider provider)
     {
       return Text.ToString(provider);
     }
 
-    object IConvertible.ToType(Type conversionType, IFormatProvider provider)
+    object IConvertible.ToType(System.Type conversionType, System.IFormatProvider provider)
     {
       if (conversionType.Equals(typeof(string)))
         return ((IConvertible)Text).ToType(conversionType, provider);
@@ -1311,28 +1320,30 @@ namespace Csla
         return ((IConvertible)_date).ToType(conversionType, provider);
     }
 
-    ushort IConvertible.ToUInt16(IFormatProvider provider)
+    ushort IConvertible.ToUInt16(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToUInt16(provider);
     }
 
-    uint IConvertible.ToUInt32(IFormatProvider provider)
+    uint IConvertible.ToUInt32(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToUInt32(provider);
     }
 
-    ulong IConvertible.ToUInt64(IFormatProvider provider)
+    ulong IConvertible.ToUInt64(System.IFormatProvider provider)
     {
       return ((IConvertible)_date).ToUInt64(provider);
     }
 
 #endregion
 
+#endif
+
 #region IFormattable Members
 
     string IFormattable.ToString(string format, IFormatProvider formatProvider)
     {
-      return ToString(format);
+      return this.ToString(format);
     }
 
 #endregion
@@ -1352,7 +1363,7 @@ namespace Csla
     {
       _date = info.GetValue<DateTime>("SmartDate._date");
       _defaultFormat = info.GetValue<string>("SmartDate._defaultFormat");
-      _emptyValue = (EmptyValue)Enum.Parse(typeof(EmptyValue), info.GetValue<string>("SmartDate._emptyValue"), true);
+      _emptyValue = (EmptyValue)System.Enum.Parse(typeof(EmptyValue), info.GetValue<string>("SmartDate._emptyValue"), true);
       _format = info.GetValue<string>("SmartDate._format");
       _initialized = info.GetValue<bool>("SmartDate._initialized");
     }

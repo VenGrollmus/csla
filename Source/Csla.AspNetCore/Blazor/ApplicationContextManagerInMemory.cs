@@ -1,4 +1,4 @@
-﻿#if NET8_0_OR_GREATER
+﻿#if NET5_0_OR_GREATER
 //-----------------------------------------------------------------------
 // <copyright file="ApplicationContextManagerInMemory.cs" company="Marimer LLC">
 //     Copyright (c) Marimer LLC. All rights reserved.
@@ -20,8 +20,8 @@ namespace Csla.AspNetCore.Blazor
   /// </summary>
   public class ApplicationContextManagerInMemory : IContextManager, IDisposable
   {
-    private IContextDictionary? LocalContext { get; set; }
-    private IContextDictionary? ClientContext { get; set; }
+    private ContextDictionary LocalContext { get; set; }
+    private ContextDictionary ClientContext { get; set; }
     private IPrincipal CurrentPrincipal { get; set; }
     private readonly ClaimsPrincipal UnauthenticatedPrincipal = new();
     private bool disposedValue;
@@ -34,14 +34,14 @@ namespace Csla.AspNetCore.Blazor
     /// <summary>
     /// Gets or sets a reference to the current ApplicationContext.
     /// </summary>
-    public ApplicationContext? ApplicationContext { get; set; }
+    public ApplicationContext ApplicationContext { get; set; }
 
     /// <summary>
     /// Gets the active circuit state.
     /// </summary>
     protected ActiveCircuitState ActiveCircuitState { get; }
 
-    private readonly HttpContext? HttpContext;
+    private readonly HttpContext HttpContext;
 
     /// <summary>
     /// Creates an instance of the object, initializing it
@@ -50,13 +50,11 @@ namespace Csla.AspNetCore.Blazor
     /// <param name="httpContextAccessor"></param>
     /// <param name="authenticationStateProvider">AuthenticationStateProvider service</param>
     /// <param name="activeCircuitState"></param>
-    /// <exception cref="ArgumentNullException"><paramref name="httpContextAccessor"/>, <paramref name="authenticationStateProvider"/> or <paramref name="activeCircuitState"/> is <see langword="null"/>.</exception>
     public ApplicationContextManagerInMemory(IHttpContextAccessor httpContextAccessor, AuthenticationStateProvider authenticationStateProvider, ActiveCircuitState activeCircuitState)
     {
-      ArgumentNullException.ThrowIfNull(httpContextAccessor);
       HttpContext = httpContextAccessor.HttpContext;
-      AuthenticationStateProvider = authenticationStateProvider ?? throw new ArgumentNullException(nameof(authenticationStateProvider));
-      ActiveCircuitState = activeCircuitState ?? throw new ArgumentNullException(nameof(activeCircuitState));
+      AuthenticationStateProvider = authenticationStateProvider;
+      ActiveCircuitState = activeCircuitState;
       CurrentPrincipal = UnauthenticatedPrincipal;
       AuthenticationStateProvider.AuthenticationStateChanged += AuthenticationStateProvider_AuthenticationStateChanged;
       _ = InitializeUser();
@@ -64,10 +62,9 @@ namespace Csla.AspNetCore.Blazor
 
     private async Task InitializeUser()
     {
-      var httpContext = HttpContext;
-      if (httpContext != null)
+      if (HttpContext != null)
       {
-        var user = httpContext.User;
+        var user = HttpContext.User;
         if (user != null)
           CurrentPrincipal = user;
       }
@@ -170,9 +167,9 @@ namespace Csla.AspNetCore.Blazor
     /// <summary>
     /// Gets the local context.
     /// </summary>
-    public IContextDictionary? GetLocalContext()
+    public ContextDictionary GetLocalContext()
     {
-      LocalContext ??= new ContextDictionary();
+      LocalContext ??= [];
       return LocalContext;
     }
 
@@ -180,7 +177,7 @@ namespace Csla.AspNetCore.Blazor
     /// Sets the local context.
     /// </summary>
     /// <param name="localContext">Local context.</param>
-    public void SetLocalContext(IContextDictionary? localContext)
+    public void SetLocalContext(ContextDictionary localContext)
     {
       LocalContext = localContext;
     }
@@ -189,9 +186,9 @@ namespace Csla.AspNetCore.Blazor
     /// Gets the client context.
     /// </summary>
     /// <param name="executionLocation"></param>
-    public IContextDictionary? GetClientContext(ApplicationContext.ExecutionLocations executionLocation)
+    public ContextDictionary GetClientContext(ApplicationContext.ExecutionLocations executionLocation)
     {
-      ClientContext ??= new ContextDictionary();
+      ClientContext ??= [];
       return ClientContext;
     }
 
@@ -200,7 +197,7 @@ namespace Csla.AspNetCore.Blazor
     /// </summary>
     /// <param name="clientContext">Client context.</param>
     /// <param name="executionLocation"></param>
-    public void SetClientContext(IContextDictionary? clientContext, ApplicationContext.ExecutionLocations executionLocation)
+    public void SetClientContext(ContextDictionary clientContext, ApplicationContext.ExecutionLocations executionLocation)
     {
       ClientContext = clientContext;
     }

@@ -8,7 +8,7 @@
 
 namespace Csla.Test.ObjectFactory
 {
-  [Server.ObjectFactory("Csla.Test.ObjectFactory.RootFactory, Csla.Tests")]
+  [Csla.Server.ObjectFactory("Csla.Test.ObjectFactory.RootFactory, Csla.Tests")]
   [Serializable]
   public class Root : BusinessBase<Root>
   {
@@ -19,8 +19,8 @@ namespace Csla.Test.ObjectFactory
       set { SetProperty(DataProperty, value); }
     }
 
-    private static PropertyInfo<ApplicationContext.ExecutionLocations> LocationProperty = RegisterProperty<ApplicationContext.ExecutionLocations>(nameof(Location));
-    public ApplicationContext.ExecutionLocations Location
+    private static PropertyInfo<Csla.ApplicationContext.ExecutionLocations> LocationProperty = RegisterProperty<Csla.ApplicationContext.ExecutionLocations>(nameof(Location));
+    public Csla.ApplicationContext.ExecutionLocations Location
     {
       get { return GetProperty(LocationProperty); }
       set { SetProperty(LocationProperty, value); }

@@ -10,7 +10,7 @@ namespace Csla.Test.CommandBase
   [TestClass]
   public class CommandBaseTest : Csla.Server.ObjectFactory
   {
-    public CommandBaseTest() : base(null)
+    public CommandBaseTest(ApplicationContext applicationContext) : base(applicationContext)
     {
     }
 
@@ -22,10 +22,10 @@ namespace Csla.Test.CommandBase
     ///</summary>
     public TestContext TestContext { get; set; }
 
-    [ClassInitialize]
+    [ClassInitialize()]
     public static void ClassInitialize(TestContext testContext) 
-    {
-      _ = testContext;
+    { 
+
     }
 
     #region Additional test attributes

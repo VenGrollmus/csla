@@ -6,9 +6,8 @@
 // <summary>Dictionary type that is serializable</summary>
 //-----------------------------------------------------------------------
 
-using Csla.Properties;
 using Csla.Serialization.Mobile;
-using System.Collections.Concurrent;
+using System.Collections.Specialized;
 
 namespace Csla.Core
 {
@@ -16,13 +15,17 @@ namespace Csla.Core
   /// Dictionary type that is serializable
   /// with the SerializationFormatterFactory.GetFormatter().
   /// </summary>
-  [Serializable]
-  public class ContextDictionary : ConcurrentDictionary<object, object>, IContextDictionary
+  [Serializable()]
+  public class ContextDictionary : HybridDictionary, IMobileObject
   {
-    /// <inheritdoc cref="Csla.Core.IContextDictionary.GetValueOrNull(string)"/>
-    public object GetValueOrNull(string key)
+    /// <summary>
+    /// Get a value from the dictionary, or return null
+    /// if the key is not found in the dictionary.
+    /// </summary>
+    /// <param name="key">Key of value to get from dictionary.</param>
+    public  object GetValueOrNull(string key)
     {
-      if (ContainsKey(key))
+      if (this.Contains(key))
         return this[key];
       return null;
     }
@@ -31,17 +34,17 @@ namespace Csla.Core
 
     void IMobileObject.GetState(SerializationInfo info)
     {
-      foreach (string key in Keys)
+      foreach (string key in this.Keys)
       {
         object value = this[key];
-        if (value is not IMobileObject)
+        if (!(value is IMobileObject))
           info.AddValue(key, value);
       }
     }
 
     void IMobileObject.GetChildren(SerializationInfo info, MobileFormatter formatter)
     {
-      foreach (string key in Keys)
+      foreach (string key in this.Keys)
       {
         object value = this[key];
         if (value is IMobileObject mobile)
@@ -54,74 +57,21 @@ namespace Csla.Core
 
     void IMobileObject.SetState(SerializationInfo info)
     {
-      foreach (var item in info.Values)
+      foreach (string key in info.Values.Keys)
       {
-        Add(item.Key, item.Value.Value);
+        Add(key, info.Values[key].Value);
       }
     }
 
     void IMobileObject.SetChildren(SerializationInfo info, MobileFormatter formatter)
     {
-      foreach (var item in info.Children)
+      foreach (string key in info.Children.Keys)
       {
-        var referenceId = item.Value.ReferenceId;
-        Add(item.Key, formatter.GetObject(referenceId));
+        int referenceId = info.Children[key].ReferenceId;
+        this.Add(key, formatter.GetObject(referenceId));
       }
     }
 
-    #endregion
-
-    #region IDictionary Members
-
-    /// <inheritdoc cref="System.Collections.IDictionary.IsReadOnly"/>
-    public bool IsReadOnly
-    {
-      get => false;
-    }
-
-    /// <inheritdoc cref="System.Collections.IDictionary.IsFixedSize"/>
-    public bool IsFixedSize
-    {
-      get => false;
-    }
-
-    /// <inheritdoc cref="System.Collections.IDictionary.Add(object, object?)"/>
-    public void Add(object key, object value)
-    {
-      bool added = TryAdd(key, value);
-      if (!added)
-      {
-        throw new ArgumentException(Resources.KeyAlreadyExistsException);
-      }
-    }
-
-    /// <inheritdoc cref="System.Collections.IDictionary.Remove(object)"/>
-    public void Remove(object key)
-    {
-      var removed = TryRemove(key, out var _);
-      if (!removed)
-      {
-        throw new NotSupportedException(Resources.KeyDoesNotExistException);
-      }
-    }
-
-    #endregion
-
-    #region ICollection Members
-
-    /// <inheritdoc cref="System.Collections.ICollection.SyncRoot"/>
-    public object SyncRoot
-    {
-      get => throw new NotSupportedException(Resources.SyncrootNotSupportedException);
-
-    }
-
-    /// <inheritdoc cref="System.Collections.ICollection.IsSynchronized"/>
-    public bool IsSynchronized
-    {
-      get => false;
-    }
-
-    #endregion
+#endregion
   }
 }

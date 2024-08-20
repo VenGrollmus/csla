@@ -8,9 +8,6 @@ using static Csla.Analyzers.Extensions.ITypeSymbolExtensions;
 
 namespace Csla.Analyzers
 {
-  /// <summary>
-  /// 
-  /// </summary>
   [DiagnosticAnalyzer(LanguageNames.CSharp)]
   public sealed class IsOperationMethodPublicAnalyzer
     : DiagnosticAnalyzer
@@ -31,15 +28,9 @@ namespace Csla.Analyzers
         helpLinkUri: HelpUrlBuilder.Build(
           Constants.AnalyzerIdentifiers.IsOperationMethodPublicForInterface, nameof(IsOperationMethodPublicAnalyzer)));
 
-    /// <summary>
-    /// 
-    /// </summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
       ImmutableArray.Create(makeNonPublicRule, makeNonPublicForInterfaceRule);
 
-    /// <summary>
-    /// 
-    /// </summary>
     public override void Initialize(AnalysisContext context)
     {
       context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
@@ -63,7 +54,7 @@ namespace Csla.Analyzers
         }
         else
         {
-          var properties = new Dictionary<string, string>
+          var properties = new Dictionary<string, string>()
           {
             [IsOperationMethodPublicAnalyzerConstants.IsSealed] = typeSymbol.IsSealed.ToString()
           }.ToImmutableDictionary();

@@ -190,7 +190,7 @@ namespace Csla.Serialization.Mobile
     /// <summary>
     /// Dictionary containing child reference data.
     /// </summary>
-    [DataMember]
+    [DataMember()]
     public Dictionary<string, ChildData> Children
     {
       get { return _children; }
@@ -201,7 +201,7 @@ namespace Csla.Serialization.Mobile
     /// <summary>
     /// Dictionary containg field data.
     /// </summary>
-    [DataMember]
+    [DataMember()]
     public Dictionary<string, FieldData> Values
     {
       get { return _values; }
@@ -210,7 +210,7 @@ namespace Csla.Serialization.Mobile
 
     internal SerializationInfo(int referenceId)
     {
-      ReferenceId = referenceId;
+      this.ReferenceId = referenceId;
     }
 
     /// <summary>
@@ -420,24 +420,5 @@ namespace Csla.Serialization.Mobile
     }
 
     #endregion
-
-    /// <summary>
-    /// Returns true if the type is considered a simple
-    /// (non-complex) serializable type by MobileFormatter.
-    /// </summary>
-    /// <param name="type">Type to evaluate</param>
-    /// <returns></returns>
-    public static bool IsNativeType(Type type)
-    {
-      bool result;
-      if (type is IMobileObject)
-        result = false;
-      else if (type.IsPrimitive || type.IsEnum)
-        result = true;
-      else
-        result = Enum.TryParse<CslaKnownTypes>(type.Name.Replace("[]", "Array"), out _);
-
-      return result;
-    }
   }
 }

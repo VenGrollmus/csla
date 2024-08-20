@@ -23,8 +23,8 @@ namespace Csla.Xaml
     /// </summary>
     public ErrorDialog()
     {
-      DialogIcon = MessageBoxImage.Exclamation;
-      DataContextChanged += ErrorDialog_DataContextChanged;
+      this.DialogIcon = MessageBoxImage.Exclamation;
+      this.DataContextChanged += ErrorDialog_DataContextChanged;
     }
 
     void ErrorDialog_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -140,22 +140,22 @@ namespace Csla.Xaml
       if (sender is DataSourceProvider dp && dp.Error != null)
       {
         string error;
-        if (ShowExceptionDetail)
+        if (this.ShowExceptionDetail)
           error = dp.Error.ToString();
         else
           error = dp.Error.Message;
 
         string output;
-        if (string.IsNullOrEmpty(DialogFirstLine))
+        if (string.IsNullOrEmpty(this.DialogFirstLine))
           output = error;
         else
-          output = $"{DialogFirstLine}{Environment.NewLine}{error}";
+          output = $"{this.DialogFirstLine}{Environment.NewLine}{error}";
 
         MessageBox.Show(
           output,
-          DialogTitle,
+          this.DialogTitle,
           MessageBoxButton.OK, 
-          DialogIcon);
+          this.DialogIcon);
       }
     }
 
