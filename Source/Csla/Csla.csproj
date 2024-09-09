@@ -20,10 +20,6 @@
     <None Remove="bin\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Remove="Properties\CslaPrivate.resx" />
-    </ItemGroup>
-
   <ItemGroup Condition="$(TargetFramework.StartsWith(&quot;net4&quot;))">
     <Reference Include="System.Configuration" />
     <Reference Include="System.ServiceModel" />
